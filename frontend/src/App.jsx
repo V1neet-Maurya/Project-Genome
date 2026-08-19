@@ -45,10 +45,17 @@ import Activity from "./pages/Activity";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 
+// =====================================================
+// ERROR PAGES
+// =====================================================
+
+import NotFound from "./pages/NotFound";
+
 function App() {
   const dispatch = useDispatch();
 
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] =
+    useState(true);
 
   // =====================================================
   // RESTORE USER AFTER PAGE REFRESH
@@ -62,7 +69,8 @@ function App() {
       // GET TOKEN FROM LOCAL STORAGE
       // =================================================
 
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token");
 
       // =================================================
       // NO TOKEN
@@ -82,9 +90,11 @@ function App() {
       // =================================================
 
       try {
-        const response = await getCurrentUser();
+        const response =
+          await getCurrentUser();
 
-        const user = response?.data?.user;
+        const user =
+          response?.data?.user;
 
         if (user && isMounted) {
           dispatch(setUser(user));
@@ -95,7 +105,8 @@ function App() {
           error
         );
 
-        const status = error?.response?.status;
+        const status =
+          error?.response?.status;
 
         // =================================================
         // INVALID / EXPIRED TOKEN
@@ -105,8 +116,13 @@ function App() {
           status === 401 ||
           status === 403
         ) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          localStorage.removeItem(
+            "token"
+          );
+
+          localStorage.removeItem(
+            "user"
+          );
 
           if (isMounted) {
             dispatch(clearUser());
@@ -262,24 +278,12 @@ function App() {
       </Route>
 
       {/* =================================================
-          UNKNOWN ROUTE
+          404 - PAGE NOT FOUND
       ================================================= */}
 
       <Route
         path="*"
-        element={
-          localStorage.getItem("token") ? (
-            <Navigate
-              to="/dashboard"
-              replace
-            />
-          ) : (
-            <Navigate
-              to="/login"
-              replace
-            />
-          )
-        }
+        element={<NotFound />}
       />
 
     </Routes>

@@ -40,17 +40,15 @@ const Stat = ({
   cls,
 }) => {
   return (
-    <div className="glass rounded-2xl p-5">
+    <div className="glass min-w-0 rounded-2xl p-5">
       <div className="flex items-center gap-4">
-
         <div
-          className={`grid h-14 w-14 place-items-center rounded-xl ${cls}`}
+          className={`grid h-14 w-14 shrink-0 place-items-center rounded-xl ${cls}`}
         >
           <Icon size={25} />
         </div>
 
         <div className="min-w-0">
-
           <p className="text-sm text-slate-400">
             {title}
           </p>
@@ -68,9 +66,7 @@ const Stat = ({
           >
             {change}
           </p>
-
         </div>
-
       </div>
     </div>
   );
@@ -86,20 +82,16 @@ const Card = ({
   action,
 }) => {
   return (
-    <section className="glass rounded-2xl p-5">
-
-      <div className="mb-5 flex items-center justify-between">
-
-        <h2 className="font-semibold text-white">
+    <section className="glass min-w-0 rounded-2xl p-5">
+      <div className="mb-5 flex min-w-0 items-center justify-between gap-3">
+        <h2 className="truncate font-semibold text-white">
           {title}
         </h2>
 
         {action}
-
       </div>
 
       {children}
-
     </section>
   );
 };
@@ -150,7 +142,6 @@ const getTaskStatusLabel = (status) => {
 // =====================================================
 
 export default function Dashboard() {
-
   const navigate = useNavigate();
 
   // ===================================================
@@ -180,7 +171,6 @@ export default function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
-
       setLoading(true);
       setError("");
 
@@ -197,9 +187,7 @@ export default function Dashboard() {
       setDashboard(
         response.data || {}
       );
-
     } catch (error) {
-
       console.error(
         "Dashboard error:",
         error
@@ -210,11 +198,8 @@ export default function Dashboard() {
           error.message ||
           "Failed to load dashboard"
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
@@ -232,12 +217,9 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-full p-6">
-
+      <div className="min-h-full p-4 sm:p-6">
         <div className="flex min-h-[70vh] items-center justify-center">
-
           <div className="text-center">
-
             <RefreshCw
               size={32}
               className="mx-auto animate-spin text-violet-400"
@@ -246,11 +228,8 @@ export default function Dashboard() {
             <p className="mt-4 text-sm text-slate-400">
               Loading dashboard...
             </p>
-
           </div>
-
         </div>
-
       </div>
     );
   }
@@ -261,10 +240,8 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="min-h-full p-6">
-
+      <div className="min-h-full p-4 sm:p-6">
         <div className="mx-auto max-w-lg rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center">
-
           <p className="text-sm text-red-400">
             {error}
           </p>
@@ -276,9 +253,7 @@ export default function Dashboard() {
           >
             Try Again
           </button>
-
         </div>
-
       </div>
     );
   }
@@ -396,32 +371,30 @@ export default function Dashboard() {
   // ===================================================
 
   return (
-    <div className="p-6">
+    <div className="min-w-0 p-4 sm:p-6">
 
       {/* =================================================
           HEADER
       ================================================= */}
 
-      <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="mb-7 flex min-w-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
 
-        <div>
-
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             Good morning,{" "}
             {user?.firstName || "there"} 👋
           </h1>
 
-          <p className="mt-1 text-slate-400">
+          <p className="mt-1 text-sm text-slate-400 sm:text-base">
             Here's what's happening across
             your workspace.
           </p>
-
         </div>
 
         <button
           type="button"
           onClick={fetchDashboard}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.06] hover:text-white"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.06] hover:text-white sm:w-auto"
         >
           <RefreshCw size={16} />
 
@@ -434,9 +407,7 @@ export default function Dashboard() {
           STATS
       ================================================= */}
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-
-        {/* PROJECTS */}
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
 
         <Stat
           icon={FolderKanban}
@@ -445,8 +416,6 @@ export default function Dashboard() {
           change="Active projects"
           cls="bg-violet-600/90 text-white"
         />
-
-        {/* TASKS */}
 
         <Stat
           icon={ListChecks}
@@ -457,8 +426,6 @@ export default function Dashboard() {
           } completed`}
           cls="bg-blue-600/90 text-white"
         />
-
-        {/* ISSUES */}
 
         <Stat
           icon={Bug}
@@ -472,8 +439,6 @@ export default function Dashboard() {
           }
           cls="bg-orange-500/90 text-white"
         />
-
-        {/* TEAM MEMBERS */}
 
         <Stat
           icon={Users}
@@ -489,16 +454,14 @@ export default function Dashboard() {
           QUICK ACTIONS
       ================================================= */}
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-
-        {/* CREATE PROJECT */}
+      <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
 
         <button
           type="button"
           onClick={() =>
             navigate("/projects")
           }
-          className="rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
+          className="min-w-0 rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
         >
           <p className="text-sm font-semibold text-white">
             Create Project
@@ -509,14 +472,12 @@ export default function Dashboard() {
           </p>
         </button>
 
-        {/* VIEW TASKS */}
-
         <button
           type="button"
           onClick={() =>
             navigate("/tasks")
           }
-          className="rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
+          className="min-w-0 rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
         >
           <p className="text-sm font-semibold text-white">
             View Tasks
@@ -527,14 +488,12 @@ export default function Dashboard() {
           </p>
         </button>
 
-        {/* VIEW ISSUES */}
-
         <button
           type="button"
           onClick={() =>
             navigate("/issues")
           }
-          className="rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
+          className="min-w-0 rounded-2xl border border-white/[0.07] bg-[#0d1320] p-5 text-left transition hover:border-purple-500/30 hover:bg-purple-500/[0.03]"
         >
           <p className="text-sm font-semibold text-white">
             View Issues
@@ -551,19 +510,17 @@ export default function Dashboard() {
           FIRST ROW
       ================================================= */}
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.55fr_.9fr_.95fr]">
+      <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[1.55fr_.9fr_.95fr]">
 
         {/* PROJECT OVERVIEW */}
 
         <Card title="Project Overview">
 
-          <div className="h-[300px]">
-
+          <div className="h-[300px] min-w-0">
             <ResponsiveContainer
               width="100%"
               height="100%"
             >
-
               <AreaChart
                 data={chartData}
                 margin={{
@@ -573,9 +530,7 @@ export default function Dashboard() {
                   bottom: 0,
                 }}
               >
-
                 <defs>
-
                   <linearGradient
                     id="purple"
                     x1="0"
@@ -583,7 +538,6 @@ export default function Dashboard() {
                     x2="0"
                     y2="1"
                   >
-
                     <stop
                       offset="0%"
                       stopColor="#8b5cf6"
@@ -595,9 +549,7 @@ export default function Dashboard() {
                       stopColor="#8b5cf6"
                       stopOpacity="0"
                     />
-
                   </linearGradient>
-
                 </defs>
 
                 <CartesianGrid
@@ -645,11 +597,8 @@ export default function Dashboard() {
                   fill="transparent"
                   strokeWidth={2}
                 />
-
               </AreaChart>
-
             </ResponsiveContainer>
-
           </div>
 
         </Card>
@@ -679,11 +628,12 @@ export default function Dashboard() {
                   return (
                     <div
                       key={project._id}
+                      className="min-w-0"
                     >
 
-                      <div className="mb-2 flex justify-between text-sm">
+                      <div className="mb-2 flex min-w-0 justify-between text-sm">
 
-                        <span className="truncate text-white">
+                        <span className="min-w-0 truncate text-white">
                           {project.name}
                         </span>
 
@@ -731,7 +681,7 @@ export default function Dashboard() {
 
                 <div
                   key={task._id}
-                  className="flex items-center gap-3 border-b border-white/5 pb-4 last:border-0"
+                  className="flex min-w-0 items-center gap-3 border-b border-white/5 pb-4 last:border-0"
                 >
 
                   <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-white/10 text-center">
@@ -758,7 +708,7 @@ export default function Dashboard() {
 
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 truncate text-xs text-slate-500">
 
                       {task.project?.name ||
                         "Project"}
@@ -798,13 +748,15 @@ export default function Dashboard() {
           SECOND ROW
       ================================================= */}
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_1.1fr_.95fr]">
+      <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-[1.1fr_1.1fr_.95fr]">
 
         {/* TASK STATUS */}
 
         <Card title="Task Status">
 
-          <div className="flex items-center gap-7">
+          <div className="flex min-w-0 flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-7">
+
+            {/* CHART */}
 
             <div className="h-48 w-48 shrink-0">
 
@@ -812,7 +764,6 @@ export default function Dashboard() {
                 width="100%"
                 height="100%"
               >
-
                 <PieChart>
 
                   <Pie
@@ -822,10 +773,8 @@ export default function Dashboard() {
                     outerRadius={76}
                     paddingAngle={2}
                   >
-
                     {pieData.map(
                       (item, index) => (
-
                         <Cell
                           key={item.name}
                           fill={
@@ -834,18 +783,14 @@ export default function Dashboard() {
                             ]
                           }
                         />
-
                       )
                     )}
-
                   </Pie>
 
                 </PieChart>
-
               </ResponsiveContainer>
 
               <div className="-mt-[116px] text-center">
-
                 <b className="text-2xl">
                   {totalTasks}
                 </b>
@@ -853,25 +798,26 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-500">
                   Total
                 </p>
-
               </div>
 
             </div>
 
-            <div className="flex-1 space-y-4">
+            {/* LEGEND */}
+
+            <div className="w-full min-w-0 flex-1 space-y-4 sm:w-auto">
 
               {pieData.map(
                 (item, index) => (
 
                   <div
                     key={item.name}
-                    className="flex items-center justify-between text-sm"
+                    className="flex min-w-0 items-center justify-between gap-3 text-sm"
                   >
 
-                    <span className="flex items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-2">
 
                       <span
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{
                           background:
                             pieColors[
@@ -880,11 +826,13 @@ export default function Dashboard() {
                         }}
                       />
 
-                      {item.name}
+                      <span className="truncate">
+                        {item.name}
+                      </span>
 
                     </span>
 
-                    <span className="text-slate-400">
+                    <span className="shrink-0 text-slate-400">
 
                       {item.value}
 
@@ -936,7 +884,7 @@ export default function Dashboard() {
                     onClick={() =>
                       navigate("/projects")
                     }
-                    className="flex w-full items-center gap-3 border-b border-white/5 py-3 text-left last:border-0 hover:bg-white/[0.02]"
+                    className="flex w-full min-w-0 items-center gap-3 border-b border-white/5 py-3 text-left last:border-0 hover:bg-white/[0.02]"
                   >
 
                     <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-violet-500 text-white">
@@ -947,13 +895,13 @@ export default function Dashboard() {
 
                     </div>
 
-                    <span className="flex-1 truncate text-sm text-white">
+                    <span className="min-w-0 flex-1 truncate text-sm text-white">
                       {project.name}
                     </span>
 
                     <ArrowUpRight
                       size={16}
-                      className="text-slate-500"
+                      className="shrink-0 text-slate-500"
                     />
 
                   </button>
@@ -979,7 +927,7 @@ export default function Dashboard() {
 
                 <div
                   key={`task-${task._id}`}
-                  className="flex gap-3"
+                  className="flex min-w-0 gap-3"
                 >
 
                   <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5">
@@ -994,13 +942,10 @@ export default function Dashboard() {
                   <div className="min-w-0 flex-1">
 
                     <p className="text-xs text-slate-300">
-
                       <b>Task</b>{" "}
-
                       {getTaskStatusLabel(
                         task.status
                       )}
-
                     </p>
 
                     <p className="truncate text-xs text-slate-500">
@@ -1019,7 +964,7 @@ export default function Dashboard() {
 
                 <div
                   key={`issue-${issue._id}`}
-                  className="flex gap-3"
+                  className="flex min-w-0 gap-3"
                 >
 
                   <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5">
@@ -1034,11 +979,8 @@ export default function Dashboard() {
                   <div className="min-w-0 flex-1">
 
                     <p className="text-xs text-slate-300">
-
                       <b>Issue</b>{" "}
-
                       {issue.status}
-
                     </p>
 
                     <p className="truncate text-xs text-slate-500">
