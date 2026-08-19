@@ -52,14 +52,29 @@ app.use(helmet());
 // =====================================================
 
 const allowedOrigins = [
+  // Local development
   "http://localhost:5173",
+  "http://localhost:5174",
+
+  // Current Vercel deployment
+  "https://project-genome-od2xpkrky-v1neet-mauryas-projects.vercel.app",
+
+  // Vercel production domain, if used
+  "https://project-genome-three.vercel.app",
+
+  // Render environment variable
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
+console.log(
+  "Allowed CORS origins:",
+  allowedOrigins
+);
+
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow Postman, curl and server-to-server requests
-    // that do not send an Origin header.
+    // Requests such as Postman/curl
+    // may not contain an Origin header.
     if (!origin) {
       return callback(null, true);
     }
@@ -68,7 +83,16 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    return callback(new Error("Not allowed by CORS"));
+    console.error(
+      "CORS blocked origin:",
+      origin
+    );
+
+    return callback(
+      new Error(
+        `CORS blocked origin: ${origin}`
+      )
+    );
   },
 
   credentials: true,
@@ -90,8 +114,11 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// CORS MUST COME BEFORE API RATE LIMITING
+// CORS MUST COME BEFORE API ROUTES
 app.use(cors(corsOptions));
+
+// Explicitly handle browser preflight requests
+app.options("*", cors(corsOptions));
 
 // =====================================================
 // RATE LIMITING
@@ -108,7 +135,8 @@ const limiter = rateLimit({
 
   message: {
     success: false,
-    message: "Too many requests. Please try again later.",
+    message:
+      "Too many requests. Please try again later.",
   },
 });
 
@@ -119,6 +147,12 @@ app.use("/api", limiter);
 // =====================================================
 
 app.use(express.json());
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 // =====================================================
 // LOGGER
@@ -139,6 +173,12 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
+
+    methods: [
+      "GET",
+      "POST",
+    ],
+
     credentials: true,
   },
 });
@@ -146,7 +186,10 @@ const io = new Server(server, {
 app.set("io", io);
 
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
+  console.log(
+    "Socket connected:",
+    socket.id
+  );
 
   socket.on("join-user", (userId) => {
     if (!userId) {
@@ -155,11 +198,16 @@ io.on("connection", (socket) => {
 
     socket.join(`user:${userId}`);
 
-    console.log(`User ${userId} joined room`);
+    console.log(
+      `User ${userId} joined room`
+    );
   });
 
   socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
+    console.log(
+      "Socket disconnected:",
+      socket.id
+    );
   });
 });
 
@@ -167,130 +215,182 @@ io.on("connection", (socket) => {
 // HEALTH CHECK
 // =====================================================
 
-app.get("/api/v1/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Genome API is running",
-  });
-});
+app.get(
+  "/api/v1/health",
+  (req, res) => {
+    res.status(200).json({
+      success: true,
+      message:
+        "Genome API is running",
+    });
+  }
+);
 
 // =====================================================
 // AUTH ROUTES
 // =====================================================
 
-app.use("/api/v1/auth", authRoutes);
+app.use(
+  "/api/v1/auth",
+  authRoutes
+);
 
 // =====================================================
 // PROJECT ROUTES
 // =====================================================
 
-app.use("/api/v1/projects", projectRoutes);
+app.use(
+  "/api/v1/projects",
+  projectRoutes
+);
 
 // =====================================================
 // TASK ROUTES
 // =====================================================
 
-app.use("/api/v1/tasks", taskRoutes);
+app.use(
+  "/api/v1/tasks",
+  taskRoutes
+);
 
 // =====================================================
 // ISSUE ROUTES
 // =====================================================
 
-app.use("/api/v1/issues", issueRoutes);
+app.use(
+  "/api/v1/issues",
+  issueRoutes
+);
 
 // =====================================================
 // TEAM ROUTES
 // =====================================================
 
-app.use("/api/v1/team", teamRoutes);
+app.use(
+  "/api/v1/team",
+  teamRoutes
+);
 
 // =====================================================
 // DASHBOARD ROUTES
 // =====================================================
 
-app.use("/api/v1/dashboard", dashboardRoutes);
+app.use(
+  "/api/v1/dashboard",
+  dashboardRoutes
+);
 
 // =====================================================
 // DOCUMENT ROUTES
 // =====================================================
 
-app.use("/api/v1/documents", documentRoutes);
+app.use(
+  "/api/v1/documents",
+  documentRoutes
+);
 
 // =====================================================
 // ACTIVITY ROUTES
 // =====================================================
 
-app.use("/api/v1/activities", activityRoutes);
+app.use(
+  "/api/v1/activities",
+  activityRoutes
+);
 
 // =====================================================
 // NOTIFICATION ROUTES
 // =====================================================
 
-app.use("/api/v1/notifications", notificationRoutes);
+app.use(
+  "/api/v1/notifications",
+  notificationRoutes
+);
 
 // =====================================================
 // SEARCH ROUTES
 // =====================================================
 
-app.use("/api/v1/search", searchRoutes);
+app.use(
+  "/api/v1/search",
+  searchRoutes
+);
 
 // =====================================================
 // ANALYTICS ROUTES
 // =====================================================
 
-app.use("/api/v1/analytics", analyticsRoutes);
+app.use(
+  "/api/v1/analytics",
+  analyticsRoutes
+);
 
 // =====================================================
 // USER ROUTES
 // =====================================================
 
-app.use("/api/v1/user", userRoutes);
+app.use(
+  "/api/v1/user",
+  userRoutes
+);
 
 // =====================================================
 // TEST JWT
 // =====================================================
 
-app.get("/api/v1/test-token", (req, res) => {
-  res.status(200).json({
-    success: true,
+app.get(
+  "/api/v1/test-token",
+  (req, res) => {
+    res.status(200).json({
+      success: true,
 
-    jwtSecretLoaded: !!process.env.JWT_SECRET,
+      jwtSecretLoaded:
+        !!process.env.JWT_SECRET,
 
-    jwtSecretLength:
-      process.env.JWT_SECRET?.length || 0,
-  });
-});
+      jwtSecretLength:
+        process.env.JWT_SECRET?.length ||
+        0,
+    });
+  }
+);
 
 // =====================================================
 // TEST CLOUDINARY CONNECTION
 // =====================================================
 
-app.get("/api/v1/test-cloudinary", async (req, res) => {
-  try {
-    const result = await cloudinary.api.ping();
+app.get(
+  "/api/v1/test-cloudinary",
+  async (req, res) => {
+    try {
+      const result =
+        await cloudinary.api.ping();
 
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error("Cloudinary test error:", error);
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      console.error(
+        "Cloudinary test error:",
+        error
+      );
 
-    res.status(500).json({
-      success: false,
+      res.status(500).json({
+        success: false,
 
-      message:
-        error?.message ||
-        "Cloudinary test failed",
+        message:
+          error?.message ||
+          "Cloudinary test failed",
 
-      cloudinaryStatus:
-        error?.http_code || null,
+        cloudinaryStatus:
+          error?.http_code || null,
 
-      details:
-        error?.error || null,
-    });
+        details:
+          error?.error || null,
+      });
+    }
   }
-});
+);
 
 // =====================================================
 // TEST CLOUDINARY UPLOAD
@@ -304,9 +404,11 @@ app.get(
         await cloudinary.uploader.upload(
           "https://res.cloudinary.com/demo/image/upload/sample.jpg",
           {
-            folder: "genome/test",
+            folder:
+              "genome/test",
 
-            resource_type: "image",
+            resource_type:
+              "image",
           }
         );
 
@@ -342,12 +444,15 @@ app.get(
 // MUST COME AFTER ALL ROUTES
 // =====================================================
 
-app.use((req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: "API route not found",
-  });
-});
+app.use(
+  (req, res) => {
+    return res.status(404).json({
+      success: false,
+      message:
+        "API route not found",
+    });
+  }
+);
 
 // =====================================================
 // GLOBAL ERROR HANDLER
@@ -360,17 +465,22 @@ app.use(errorMiddleware);
 // START SERVER
 // =====================================================
 
-const PORT = process.env.PORT || 8000;
+const PORT =
+  process.env.PORT || 8000;
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    server.listen(PORT, "0.0.0.0", () => {
-      console.log(
-        `Genome API running on port ${PORT}`
-      );
-    });
+    server.listen(
+      PORT,
+      "0.0.0.0",
+      () => {
+        console.log(
+          `Genome API running on port ${PORT}`
+        );
+      }
+    );
   } catch (error) {
     console.error(
       "Server could not connect to MongoDB.",
