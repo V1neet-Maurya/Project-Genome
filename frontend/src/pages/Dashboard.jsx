@@ -42,6 +42,7 @@ const Stat = ({
   return (
     <div className="glass min-w-0 rounded-2xl p-5">
       <div className="flex items-center gap-4">
+
         <div
           className={`grid h-14 w-14 shrink-0 place-items-center rounded-xl ${cls}`}
         >
@@ -49,6 +50,7 @@ const Stat = ({
         </div>
 
         <div className="min-w-0">
+
           <p className="text-sm text-slate-400">
             {title}
           </p>
@@ -66,7 +68,9 @@ const Stat = ({
           >
             {change}
           </p>
+
         </div>
+
       </div>
     </div>
   );
@@ -83,15 +87,19 @@ const Card = ({
 }) => {
   return (
     <section className="glass min-w-0 rounded-2xl p-5">
+
       <div className="mb-5 flex min-w-0 items-center justify-between gap-3">
+
         <h2 className="truncate font-semibold text-white">
           {title}
         </h2>
 
         {action}
+
       </div>
 
       {children}
+
     </section>
   );
 };
@@ -142,6 +150,7 @@ const getTaskStatusLabel = (status) => {
 // =====================================================
 
 export default function Dashboard() {
+
   const navigate = useNavigate();
 
   // ===================================================
@@ -170,7 +179,9 @@ export default function Dashboard() {
   // ===================================================
 
   const fetchDashboard = async () => {
+
     try {
+
       setLoading(true);
       setError("");
 
@@ -185,21 +196,26 @@ export default function Dashboard() {
       }
 
       setDashboard(
-        response.data || {}
+        response?.data || {}
       );
+
     } catch (error) {
+
       console.error(
         "Dashboard error:",
         error
       );
 
       setError(
-        error.response?.data?.message ||
-          error.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Failed to load dashboard"
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
@@ -216,10 +232,14 @@ export default function Dashboard() {
   // ===================================================
 
   if (loading) {
+
     return (
       <div className="min-h-full p-4 sm:p-6">
+
         <div className="flex min-h-[70vh] items-center justify-center">
+
           <div className="text-center">
+
             <RefreshCw
               size={32}
               className="mx-auto animate-spin text-violet-400"
@@ -228,8 +248,11 @@ export default function Dashboard() {
             <p className="mt-4 text-sm text-slate-400">
               Loading dashboard...
             </p>
+
           </div>
+
         </div>
+
       </div>
     );
   }
@@ -239,9 +262,12 @@ export default function Dashboard() {
   // ===================================================
 
   if (error) {
+
     return (
       <div className="min-h-full p-4 sm:p-6">
+
         <div className="mx-auto max-w-lg rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center">
+
           <p className="text-sm text-red-400">
             {error}
           </p>
@@ -253,7 +279,9 @@ export default function Dashboard() {
           >
             Try Again
           </button>
+
         </div>
+
       </div>
     );
   }
@@ -272,23 +300,17 @@ export default function Dashboard() {
     dashboard?.issues || {};
 
   const projects =
-    Array.isArray(
-      dashboard?.projects
-    )
+    Array.isArray(dashboard?.projects)
       ? dashboard.projects
       : [];
 
   const recentTasks =
-    Array.isArray(
-      dashboard?.recentTasks
-    )
+    Array.isArray(dashboard?.recentTasks)
       ? dashboard.recentTasks
       : [];
 
   const recentIssues =
-    Array.isArray(
-      dashboard?.recentIssues
-    )
+    Array.isArray(dashboard?.recentIssues)
       ? dashboard.recentIssues
       : [];
 
@@ -299,22 +321,22 @@ export default function Dashboard() {
   const pieData = [
     {
       name: "To Do",
-      value: taskStats.todo || 0,
+      value: Number(taskStats.todo) || 0,
     },
     {
       name: "In Progress",
       value:
-        taskStats.inProgress || 0,
+        Number(taskStats.inProgress) || 0,
     },
     {
       name: "In Review",
       value:
-        taskStats.inReview || 0,
+        Number(taskStats.inReview) || 0,
     },
     {
       name: "Completed",
       value:
-        taskStats.completed || 0,
+        Number(taskStats.completed) || 0,
     },
   ];
 
@@ -326,7 +348,7 @@ export default function Dashboard() {
   ];
 
   const totalTasks =
-    stats.tasks || 0;
+    Number(stats.tasks) || 0;
 
   // ===================================================
   // CHART DATA
@@ -336,33 +358,33 @@ export default function Dashboard() {
     {
       name: "To Do",
       tasks:
-        taskStats.todo || 0,
+        Number(taskStats.todo) || 0,
       issues:
-        issueStats.open || 0,
+        Number(issueStats.open) || 0,
     },
 
     {
       name: "Progress",
       tasks:
-        taskStats.inProgress || 0,
+        Number(taskStats.inProgress) || 0,
       issues:
-        issueStats.inProgress || 0,
+        Number(issueStats.inProgress) || 0,
     },
 
     {
       name: "Review",
       tasks:
-        taskStats.inReview || 0,
+        Number(taskStats.inReview) || 0,
       issues:
-        issueStats.resolved || 0,
+        Number(issueStats.resolved) || 0,
     },
 
     {
       name: "Completed",
       tasks:
-        taskStats.completed || 0,
+        Number(taskStats.completed) || 0,
       issues:
-        issueStats.closed || 0,
+        Number(issueStats.closed) || 0,
     },
   ];
 
@@ -380,6 +402,7 @@ export default function Dashboard() {
       <div className="mb-7 flex min-w-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
 
         <div className="min-w-0">
+
           <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             Good morning,{" "}
             {user?.firstName || "there"} 👋
@@ -389,6 +412,7 @@ export default function Dashboard() {
             Here's what's happening across
             your workspace.
           </p>
+
         </div>
 
         <button
@@ -397,7 +421,6 @@ export default function Dashboard() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.06] hover:text-white sm:w-auto"
         >
           <RefreshCw size={16} />
-
           Refresh
         </button>
 
@@ -421,9 +444,7 @@ export default function Dashboard() {
           icon={ListChecks}
           title="Tasks"
           value={stats.tasks || 0}
-          change={`${
-            stats.completedTasks || 0
-          } completed`}
+          change={`${stats.completedTasks || 0} completed`}
           cls="bg-blue-600/90 text-white"
         />
 
@@ -431,9 +452,7 @@ export default function Dashboard() {
           icon={Bug}
           title="Issues"
           value={stats.issues || 0}
-          change={`${
-            stats.openIssues || 0
-          } open`}
+          change={`${stats.openIssues || 0} open`}
           positive={
             (stats.openIssues || 0) === 0
           }
@@ -470,6 +489,7 @@ export default function Dashboard() {
           <p className="mt-1 text-xs text-slate-500">
             Start a new project
           </p>
+
         </button>
 
         <button
@@ -486,6 +506,7 @@ export default function Dashboard() {
           <p className="mt-1 text-xs text-slate-500">
             Manage your work
           </p>
+
         </button>
 
         <button
@@ -502,6 +523,7 @@ export default function Dashboard() {
           <p className="mt-1 text-xs text-slate-500">
             Check problems and bugs
           </p>
+
         </button>
 
       </div>
@@ -517,10 +539,12 @@ export default function Dashboard() {
         <Card title="Project Overview">
 
           <div className="h-[300px] min-w-0">
+
             <ResponsiveContainer
               width="100%"
               height="100%"
             >
+
               <AreaChart
                 data={chartData}
                 margin={{
@@ -530,7 +554,9 @@ export default function Dashboard() {
                   bottom: 0,
                 }}
               >
+
                 <defs>
+
                   <linearGradient
                     id="purple"
                     x1="0"
@@ -538,6 +564,7 @@ export default function Dashboard() {
                     x2="0"
                     y2="1"
                   >
+
                     <stop
                       offset="0%"
                       stopColor="#8b5cf6"
@@ -549,7 +576,9 @@ export default function Dashboard() {
                       stopColor="#8b5cf6"
                       stopOpacity="0"
                     />
+
                   </linearGradient>
+
                 </defs>
 
                 <CartesianGrid
@@ -574,8 +603,7 @@ export default function Dashboard() {
 
                 <Tooltip
                   contentStyle={{
-                    background:
-                      "#101827",
+                    background: "#101827",
                     border:
                       "1px solid #29344a",
                     borderRadius: 12,
@@ -597,13 +625,18 @@ export default function Dashboard() {
                   fill="transparent"
                   strokeWidth={2}
                 />
+
               </AreaChart>
+
             </ResponsiveContainer>
+
           </div>
 
         </Card>
 
-        {/* PROJECT PROGRESS */}
+        {/* =================================================
+            PROJECT PROGRESS
+        ================================================= */}
 
         <Card title="Project Progress">
 
@@ -617,47 +650,52 @@ export default function Dashboard() {
 
             ) : (
 
-              projects.map(
-                (project, index) => {
+              projects.map((project) => {
 
-                  const progress =
-                    index === 0
-                      ? stats.taskProgress || 0
-                      : 0;
+                // IMPORTANT:
+                // Use the progress calculated by
+                // dashboardController.js
 
-                  return (
-                    <div
-                      key={project._id}
-                      className="min-w-0"
-                    >
+                const progress = Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    Number(project.progress) || 0
+                  )
+                );
 
-                      <div className="mb-2 flex min-w-0 justify-between text-sm">
+                return (
+                  <div
+                    key={project._id}
+                    className="min-w-0"
+                  >
 
-                        <span className="min-w-0 truncate text-white">
-                          {project.name}
-                        </span>
+                    <div className="mb-2 flex min-w-0 justify-between text-sm">
 
-                        <span className="ml-3 shrink-0 text-slate-400">
-                          {progress}%
-                        </span>
+                      <span className="min-w-0 truncate text-white">
+                        {project.name}
+                      </span>
 
-                      </div>
-
-                      <div className="h-1.5 rounded-full bg-slate-800">
-
-                        <div
-                          className="h-full rounded-full bg-violet-500 transition-all duration-500"
-                          style={{
-                            width: `${progress}%`,
-                          }}
-                        />
-
-                      </div>
+                      <span className="ml-3 shrink-0 text-slate-400">
+                        {progress}%
+                      </span>
 
                     </div>
-                  );
-                }
-              )
+
+                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+
+                      <div
+                        className="h-full rounded-full bg-violet-500 transition-all duration-500"
+                        style={{
+                          width: `${progress}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+                );
+              })
 
             )}
 
@@ -665,7 +703,9 @@ export default function Dashboard() {
 
         </Card>
 
-        {/* UPCOMING DEADLINES */}
+        {/* =================================================
+            UPCOMING DEADLINES
+        ================================================= */}
 
         <Card title="Upcoming Deadlines">
 
@@ -673,8 +713,12 @@ export default function Dashboard() {
 
             {recentTasks
               .filter(
-                (task) =>
-                  task.dueDate
+                (task) => task.dueDate
+              )
+              .sort(
+                (a, b) =>
+                  new Date(a.dueDate) -
+                  new Date(b.dueDate)
               )
               .slice(0, 4)
               .map((task) => (
@@ -728,8 +772,7 @@ export default function Dashboard() {
               ))}
 
             {recentTasks.filter(
-              (task) =>
-                task.dueDate
+              (task) => task.dueDate
             ).length === 0 && (
 
               <p className="text-sm text-slate-500">
@@ -756,14 +799,13 @@ export default function Dashboard() {
 
           <div className="flex min-w-0 flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-7">
 
-            {/* CHART */}
-
             <div className="h-48 w-48 shrink-0">
 
               <ResponsiveContainer
                 width="100%"
                 height="100%"
               >
+
                 <PieChart>
 
                   <Pie
@@ -773,24 +815,26 @@ export default function Dashboard() {
                     outerRadius={76}
                     paddingAngle={2}
                   >
+
                     {pieData.map(
                       (item, index) => (
                         <Cell
                           key={item.name}
                           fill={
-                            pieColors[
-                              index
-                            ]
+                            pieColors[index]
                           }
                         />
                       )
                     )}
+
                   </Pie>
 
                 </PieChart>
+
               </ResponsiveContainer>
 
               <div className="-mt-[116px] text-center">
+
                 <b className="text-2xl">
                   {totalTasks}
                 </b>
@@ -798,11 +842,10 @@ export default function Dashboard() {
                 <p className="text-xs text-slate-500">
                   Total
                 </p>
+
               </div>
 
             </div>
-
-            {/* LEGEND */}
 
             <div className="w-full min-w-0 flex-1 space-y-4 sm:w-auto">
 
@@ -820,9 +863,7 @@ export default function Dashboard() {
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{
                           background:
-                            pieColors[
-                              index
-                            ],
+                            pieColors[index],
                         }}
                       />
 
@@ -861,7 +902,9 @@ export default function Dashboard() {
 
         </Card>
 
-        {/* PROJECTS */}
+        {/* =================================================
+            PROJECTS
+        ================================================= */}
 
         <Card title="Projects">
 
@@ -915,7 +958,9 @@ export default function Dashboard() {
 
         </Card>
 
-        {/* RECENT ACTIVITY */}
+        {/* =================================================
+            RECENT ACTIVITY
+        ================================================= */}
 
         <Card title="Recent Activity">
 
