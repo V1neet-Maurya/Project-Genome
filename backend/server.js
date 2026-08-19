@@ -52,43 +52,42 @@ app.use(helmet());
 // =====================================================
 
 const allowedOrigins = [
-    "http://localhost:5173",
-];
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
 const corsOptions = {
-    origin: (origin, callback) => {
-        // Allow Postman, curl and server-to-server requests
-        // that do not send an Origin header.
-        if (!origin) {
-            return callback(null, true);
-        }
+  origin: (origin, callback) => {
+    // Allow Postman, curl and server-to-server requests
+    // that do not send an Origin header.
+    if (!origin) {
+      return callback(null, true);
+    }
 
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-        return callback(
-            new Error("Not allowed by CORS")
-        );
-    },
+    return callback(new Error("Not allowed by CORS"));
+  },
 
-    credentials: true,
+  credentials: true,
 
-    methods: [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "OPTIONS",
-    ],
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ],
 
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-    ],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
 
-    optionsSuccessStatus: 204,
+  optionsSuccessStatus: 204,
 };
 
 // CORS MUST COME BEFORE API RATE LIMITING
@@ -99,19 +98,18 @@ app.use(cors(corsOptions));
 // =====================================================
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
 
-    max: 100,
+  max: 100,
 
-    standardHeaders: true,
+  standardHeaders: true,
 
-    legacyHeaders: false,
+  legacyHeaders: false,
 
-    message: {
-        success: false,
-        message:
-            "Too many requests. Please try again later.",
-    },
+  message: {
+    success: false,
+    message: "Too many requests. Please try again later.",
+  },
 });
 
 app.use("/api", limiter);
@@ -139,270 +137,204 @@ const server = http.createServer(app);
 // =====================================================
 
 const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        credentials: true,
-    },
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
 });
 
 app.set("io", io);
 
 io.on("connection", (socket) => {
-    console.log(
-        "Socket connected:",
-        socket.id
-    );
+  console.log("Socket connected:", socket.id);
 
-    socket.on("join-user", (userId) => {
-        if (!userId) {
-            return;
-        }
+  socket.on("join-user", (userId) => {
+    if (!userId) {
+      return;
+    }
 
-        socket.join(`user:${userId}`);
+    socket.join(`user:${userId}`);
 
-        console.log(
-            `User ${userId} joined room`
-        );
-    });
+    console.log(`User ${userId} joined room`);
+  });
 
-    socket.on("disconnect", () => {
-        console.log(
-            "Socket disconnected:",
-            socket.id
-        );
-    });
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
 });
 
 // =====================================================
 // HEALTH CHECK
 // =====================================================
 
-app.get(
-    "/api/v1/health",
-    (req, res) => {
-        res.status(200).json({
-            success: true,
-            message:
-                "Genome API is running",
-        });
-    }
-);
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Genome API is running",
+  });
+});
 
 // =====================================================
 // AUTH ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/auth",
-    authRoutes
-);
+app.use("/api/v1/auth", authRoutes);
 
 // =====================================================
 // PROJECT ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/projects",
-    projectRoutes
-);
+app.use("/api/v1/projects", projectRoutes);
 
 // =====================================================
 // TASK ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/tasks",
-    taskRoutes
-);
+app.use("/api/v1/tasks", taskRoutes);
 
 // =====================================================
 // ISSUE ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/issues",
-    issueRoutes
-);
+app.use("/api/v1/issues", issueRoutes);
 
 // =====================================================
 // TEAM ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/team",
-    teamRoutes
-);
+app.use("/api/v1/team", teamRoutes);
 
 // =====================================================
 // DASHBOARD ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/dashboard",
-    dashboardRoutes
-);
+app.use("/api/v1/dashboard", dashboardRoutes);
 
 // =====================================================
 // DOCUMENT ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/documents",
-    documentRoutes
-);
+app.use("/api/v1/documents", documentRoutes);
 
 // =====================================================
 // ACTIVITY ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/activities",
-    activityRoutes
-);
+app.use("/api/v1/activities", activityRoutes);
 
 // =====================================================
 // NOTIFICATION ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/notifications",
-    notificationRoutes
-);
+app.use("/api/v1/notifications", notificationRoutes);
 
 // =====================================================
 // SEARCH ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/search",
-    searchRoutes
-);
+app.use("/api/v1/search", searchRoutes);
 
 // =====================================================
 // ANALYTICS ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/analytics",
-    analyticsRoutes
-);
+app.use("/api/v1/analytics", analyticsRoutes);
 
 // =====================================================
 // USER ROUTES
 // =====================================================
 
-app.use(
-    "/api/v1/user",
-    userRoutes
-);
+app.use("/api/v1/user", userRoutes);
 
 // =====================================================
 // TEST JWT
 // =====================================================
 
-app.get(
-    "/api/v1/test-token",
-    (req, res) => {
-        res.status(200).json({
-            success: true,
+app.get("/api/v1/test-token", (req, res) => {
+  res.status(200).json({
+    success: true,
 
-            jwtSecretLoaded:
-                !!process.env.JWT_SECRET,
+    jwtSecretLoaded: !!process.env.JWT_SECRET,
 
-            jwtSecretLength:
-                process.env.JWT_SECRET
-                    ?.length || 0,
-        });
-    }
-);
+    jwtSecretLength:
+      process.env.JWT_SECRET?.length || 0,
+  });
+});
 
 // =====================================================
 // TEST CLOUDINARY CONNECTION
 // =====================================================
 
-app.get(
-    "/api/v1/test-cloudinary",
-    async (req, res) => {
-        try {
-            const result =
-                await cloudinary.api.ping();
+app.get("/api/v1/test-cloudinary", async (req, res) => {
+  try {
+    const result = await cloudinary.api.ping();
 
-            res.status(200).json({
-                success: true,
-                data: result,
-            });
-        } catch (error) {
-            console.error(
-                "Cloudinary test error:",
-                error
-            );
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Cloudinary test error:", error);
 
-            res.status(500).json({
-                success: false,
+    res.status(500).json({
+      success: false,
 
-                message:
-                    error?.message ||
-                    "Cloudinary test failed",
+      message:
+        error?.message ||
+        "Cloudinary test failed",
 
-                cloudinaryStatus:
-                    error?.http_code ||
-                    null,
+      cloudinaryStatus:
+        error?.http_code || null,
 
-                details:
-                    error?.error ||
-                    null,
-            });
-        }
-    }
-);
+      details:
+        error?.error || null,
+    });
+  }
+});
 
 // =====================================================
 // TEST CLOUDINARY UPLOAD
 // =====================================================
 
 app.get(
-    "/api/v1/test-cloudinary-upload",
-    async (req, res) => {
-        try {
-            const result =
-                await cloudinary.uploader.upload(
-                    "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-                    {
-                        folder:
-                            "genome/test",
+  "/api/v1/test-cloudinary-upload",
+  async (req, res) => {
+    try {
+      const result =
+        await cloudinary.uploader.upload(
+          "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+          {
+            folder: "genome/test",
 
-                        resource_type:
-                            "image",
-                    }
-                );
+            resource_type: "image",
+          }
+        );
 
-            res.status(200).json({
-                success: true,
-                data: result,
-            });
-        } catch (error) {
-            console.error(
-                "Cloudinary upload test error:",
-                error
-            );
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      console.error(
+        "Cloudinary upload test error:",
+        error
+      );
 
-            res.status(500).json({
-                success: false,
+      res.status(500).json({
+        success: false,
 
-                message:
-                    error?.message ||
-                    "Upload test failed",
+        message:
+          error?.message ||
+          "Upload test failed",
 
-                cloudinaryStatus:
-                    error?.http_code ||
-                    null,
+        cloudinaryStatus:
+          error?.http_code || null,
 
-                details:
-                    error?.error ||
-                    null,
-            });
-        }
+        details:
+          error?.error || null,
+      });
     }
+  }
 );
 
 // =====================================================
@@ -410,15 +342,12 @@ app.get(
 // MUST COME AFTER ALL ROUTES
 // =====================================================
 
-app.use(
-    (req, res) => {
-        return res.status(404).json({
-            success: false,
-            message:
-                "API route not found",
-        });
-    }
-);
+app.use((req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "API route not found",
+  });
+});
 
 // =====================================================
 // GLOBAL ERROR HANDLER
@@ -431,27 +360,25 @@ app.use(errorMiddleware);
 // START SERVER
 // =====================================================
 
-const PORT =
-    process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        server.listen(
-            PORT,
-            () => {
-                console.log(
-                    `Genome API running on http://localhost:${PORT}`
-                );
-            }
-        );
-    } catch (error) {
-        console.error(
-            "Server could not connect to MongoDB.",
-            error
-        );
-    }
+    server.listen(PORT, "0.0.0.0", () => {
+      console.log(
+        `Genome API running on port ${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error(
+      "Server could not connect to MongoDB.",
+      error
+    );
+
+    process.exit(1);
+  }
 };
 
 startServer();
