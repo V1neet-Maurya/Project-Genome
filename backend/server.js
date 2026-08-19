@@ -59,7 +59,7 @@ const allowedOrigins = [
   // Current Vercel deployment
   "https://project-genome-od2xpkrky-v1neet-mauryas-projects.vercel.app",
 
-  // Vercel production domain, if used
+  // Vercel production domain
   "https://project-genome-three.vercel.app",
 
   // Render environment variable
@@ -73,8 +73,8 @@ console.log(
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Requests such as Postman/curl
-    // may not contain an Origin header.
+    // Allow Postman, curl and server-to-server requests
+    // that don't send an Origin header.
     if (!origin) {
       return callback(null, true);
     }
@@ -114,11 +114,17 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// CORS MUST COME BEFORE API ROUTES
-app.use(cors(corsOptions));
+// =====================================================
+// APPLY CORS
+// =====================================================
 
-// Explicitly handle browser preflight requests
-app.options("*", cors(corsOptions));
+// IMPORTANT:
+// Do NOT use:
+// app.options("*", cors(corsOptions));
+//
+// Express/router version used by Render rejects "*".
+
+app.use(cors(corsOptions));
 
 // =====================================================
 // RATE LIMITING
