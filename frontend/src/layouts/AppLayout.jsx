@@ -6,7 +6,8 @@ import Topbar from "../components/Topbar";
 import useSocket from "../hooks/useSocket";
 
 const AppLayout = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] =
+    useState(false);
 
   useSocket();
 
@@ -23,8 +24,8 @@ const AppLayout = () => {
           min-h-screen
           w-full
           min-w-0
-          lg:ml-64
-          lg:w-[calc(100%-16rem)]
+          lg:ml-72
+          lg:w-[calc(100%-18rem)]
         "
       >
         <Topbar
