@@ -13,6 +13,8 @@ import { useDispatch } from "react-redux";
 
 import AppLayout from "./layouts/AppLayout";
 
+import ProtectedRoute from "./routes/ProtectedRoute";
+
 import {
   getCurrentUser,
 } from "./services/authApi";
@@ -56,7 +58,11 @@ function App() {
     let isMounted = true;
 
     const restoreUser = async () => {
-      const token = sessionStorage.getItem("token");
+      // =================================================
+      // GET TOKEN FROM LOCAL STORAGE
+      // =================================================
+
+      const token = localStorage.getItem("token");
 
       // =================================================
       // NO TOKEN
@@ -95,8 +101,12 @@ function App() {
         // INVALID / EXPIRED TOKEN
         // =================================================
 
-        if (status === 401 || status === 403) {
-          sessionStorage.removeItem("token");
+        if (
+          status === 401 ||
+          status === 403
+        ) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
 
           if (isMounted) {
             dispatch(clearUser());
@@ -138,21 +148,28 @@ function App() {
     <Routes>
 
       {/* =================================================
-          DEFAULT
+          DEFAULT ROUTE
       ================================================= */}
 
       <Route
         path="/"
         element={
-          <Navigate
-            to="/dashboard"
-            replace
-          />
+          localStorage.getItem("token") ? (
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          ) : (
+            <Navigate
+              to="/login"
+              replace
+            />
+          )
         }
       />
 
       {/* =================================================
-          AUTH
+          AUTH ROUTES
       ================================================= */}
 
       <Route
@@ -166,55 +183,81 @@ function App() {
       />
 
       {/* =================================================
-          APPLICATION
+          PROTECTED APPLICATION ROUTES
       ================================================= */}
 
-      <Route element={<AppLayout />}>
+      <Route element={<ProtectedRoute />}>
 
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
+        {/* =================================================
+            APPLICATION LAYOUT
+        ================================================= */}
 
-        <Route
-          path="/projects"
-          element={<Projects />}
-        />
+        <Route element={<AppLayout />}>
 
-        <Route
-          path="/tasks"
-          element={<Tasks />}
-        />
+          {/* DASHBOARD */}
 
-        <Route
-          path="/issues"
-          element={<Issues />}
-        />
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
 
-        <Route
-          path="/team"
-          element={<Team />}
-        />
+          {/* PROJECTS */}
 
-        <Route
-          path="/documents"
-          element={<Documents />}
-        />
+          <Route
+            path="/projects"
+            element={<Projects />}
+          />
 
-        <Route
-          path="/activity"
-          element={<Activity />}
-        />
+          {/* TASKS */}
 
-        <Route
-          path="/settings"
-          element={<Settings />}
-        />
+          <Route
+            path="/tasks"
+            element={<Tasks />}
+          />
 
-        <Route
-          path="/analytics"
-          element={<Analytics />}
-        />
+          {/* ISSUES */}
+
+          <Route
+            path="/issues"
+            element={<Issues />}
+          />
+
+          {/* TEAM */}
+
+          <Route
+            path="/team"
+            element={<Team />}
+          />
+
+          {/* DOCUMENTS */}
+
+          <Route
+            path="/documents"
+            element={<Documents />}
+          />
+
+          {/* ACTIVITY */}
+
+          <Route
+            path="/activity"
+            element={<Activity />}
+          />
+
+          {/* SETTINGS */}
+
+          <Route
+            path="/settings"
+            element={<Settings />}
+          />
+
+          {/* ANALYTICS */}
+
+          <Route
+            path="/analytics"
+            element={<Analytics />}
+          />
+
+        </Route>
 
       </Route>
 
@@ -225,10 +268,17 @@ function App() {
       <Route
         path="*"
         element={
-          <Navigate
-            to="/dashboard"
-            replace
-          />
+          localStorage.getItem("token") ? (
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          ) : (
+            <Navigate
+              to="/login"
+              replace
+            />
+          )
         }
       />
 

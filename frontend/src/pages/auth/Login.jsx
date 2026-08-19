@@ -13,14 +13,11 @@ function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,12 +50,21 @@ function Login() {
       const token = data.data.token;
 
       // =========================================
-      // SAVE TOKEN PER BROWSER TAB
+      // SAVE TOKEN
       // =========================================
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "token",
         token
+      );
+
+      // =========================================
+      // SAVE USER
+      // =========================================
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
       );
 
       // =========================================
@@ -74,6 +80,7 @@ function Login() {
       navigate("/dashboard", {
         replace: true,
       });
+
     } catch (error) {
       console.error(
         "LOGIN ERROR:",
@@ -85,6 +92,7 @@ function Login() {
           error.message ||
           "Invalid email or password"
       );
+
     } finally {
       setLoading(false);
     }

@@ -10,8 +10,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // Token is stored per browser tab
-    const token = sessionStorage.getItem("token");
+    // Token persists across browser tabs and sessions
+    const token = localStorage.getItem("token");
 
     if (token) {
       config.headers = config.headers || {};
