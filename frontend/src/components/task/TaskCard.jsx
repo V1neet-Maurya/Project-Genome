@@ -17,6 +17,8 @@ const TaskCard = ({
   onStatusChange,
   onEdit,
   onDelete,
+  dragAttributes,
+  dragListeners,
 }) => {
   return (
     <div
@@ -35,7 +37,20 @@ const TaskCard = ({
       {/* TOP */}
       <div className="mb-3 flex items-start justify-between gap-3">
 
-        <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-slate-100">
+        {/* DRAG HANDLE */}
+        <h3
+          {...dragAttributes}
+          {...dragListeners}
+          className="
+            line-clamp-2
+            cursor-grab
+            text-sm
+            font-semibold
+            leading-5
+            text-slate-100
+            active:cursor-grabbing
+          "
+        >
           {task.title}
         </h3>
 
@@ -116,6 +131,12 @@ const TaskCard = ({
         {/* STATUS */}
         <select
           onPointerDown={(e) => {
+            e.stopPropagation();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+          }}
+          onClick={(e) => {
             e.stopPropagation();
           }}
           value={task.status}

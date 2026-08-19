@@ -27,8 +27,6 @@ const DraggableTask = ({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       className={
         isDragging
           ? "opacity-40"
@@ -40,6 +38,8 @@ const DraggableTask = ({
         onStatusChange={onStatusChange}
         onEdit={onEdit}
         onDelete={onDelete}
+        dragAttributes={attributes}
+        dragListeners={listeners}
       />
     </div>
   );
