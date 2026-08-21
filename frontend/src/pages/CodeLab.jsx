@@ -16,8 +16,12 @@ import {
 
 import api from "../services/api";
 
-import CodeLabUpload from "../components/CodeLab/CodeLabUpload";
-import ScoreBreakdown from "../components/CodeLab/ScoreBreakdown";
+// IMPORTANT:
+// Vercel/Linux is case-sensitive.
+// Keep this folder name exactly the same as your
+// actual folder name.
+import CodeLabUpload from "../components/codelab/CodeLabUpload";
+import ScoreBreakdown from "../components/codelab/ScoreBreakdown";
 
 // =====================================================
 // CODELAB
@@ -29,28 +33,47 @@ const CodeLab = () => {
   // =====================================================
 
   const [projects, setProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedProject, setSelectedProject] =
+    useState("");
 
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] =
+    useState(null);
 
   const [analyses, setAnalyses] = useState([]);
-  const [selectedAnalysis, setSelectedAnalysis] = useState(null);
+  const [selectedAnalysis, setSelectedAnalysis] =
+    useState(null);
 
   const [aiReview, setAiReview] = useState(null);
 
-  const [loadingProjects, setLoadingProjects] = useState(true);
-  const [loadingAnalyses, setLoadingAnalyses] = useState(false);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [loadingProjects, setLoadingProjects] =
+    useState(true);
 
-  const [taskLoading, setTaskLoading] = useState(null);
-  const [issueLoading, setIssueLoading] = useState(null);
-  const [fixLoading, setFixLoading] = useState(null);
+  const [loadingAnalyses, setLoadingAnalyses] =
+    useState(false);
 
-  const [createdTasks, setCreatedTasks] = useState({});
-  const [createdIssues, setCreatedIssues] = useState({});
+  const [analyzing, setAnalyzing] =
+    useState(false);
 
-  const [fixSuggestion, setFixSuggestion] = useState(null);
+  const [aiLoading, setAiLoading] =
+    useState(false);
+
+  const [taskLoading, setTaskLoading] =
+    useState(null);
+
+  const [issueLoading, setIssueLoading] =
+    useState(null);
+
+  const [fixLoading, setFixLoading] =
+    useState(null);
+
+  const [createdTasks, setCreatedTasks] =
+    useState({});
+
+  const [createdIssues, setCreatedIssues] =
+    useState({});
+
+  const [fixSuggestion, setFixSuggestion] =
+    useState(null);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -157,13 +180,67 @@ const CodeLab = () => {
   };
 
   // =====================================================
+  // FETCH PROJECT ANALYSES
+  // =====================================================
+
+  const fetchProjectAnalyses = async (
+    projectId
+  ) => {
+    if (!projectId) {
+      return [];
+    }
+
+    try {
+      const response = await api.get(
+        `/code-analysis/project/${projectId}`
+      );
+
+      const history =
+        response?.data?.data?.analyses ||
+        response?.data?.analyses ||
+        (Array.isArray(response?.data?.data)
+          ? response.data.data
+          : []);
+
+      const safeHistory = Array.isArray(
+        history
+      )
+        ? history
+        : [];
+
+      setAnalyses(safeHistory);
+
+      if (safeHistory.length > 0) {
+        setSelectedAnalysis(
+          safeHistory[0]
+        );
+
+        setAiReview(
+          safeHistory[0]?.aiReview ||
+            null
+        );
+      }
+
+      return safeHistory;
+    } catch (err) {
+      console.error(
+        "Failed to refresh project analyses:",
+        err
+      );
+
+      return [];
+    }
+  };
+
+  // =====================================================
   // PROJECT CHANGE
   // =====================================================
 
   const handleProjectChange = async (
     event
   ) => {
-    const projectId = event.target.value;
+    const projectId =
+      event.target.value;
 
     setSelectedProject(projectId);
     setSelectedAnalysis(null);
@@ -204,7 +281,8 @@ const CodeLab = () => {
       setAnalyses(safeHistory);
 
       if (safeHistory.length > 0) {
-        const latest = safeHistory[0];
+        const latest =
+          safeHistory[0];
 
         setSelectedAnalysis(latest);
 
@@ -233,7 +311,9 @@ const CodeLab = () => {
   // FILE CHANGE
   // =====================================================
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (
+    event
+  ) => {
     const file =
       event.target.files?.[0];
 
@@ -254,6 +334,7 @@ const CodeLab = () => {
       );
 
       event.target.value = "";
+
       return;
     }
 
@@ -274,6 +355,7 @@ const CodeLab = () => {
       setError(
         "Please select a project."
       );
+
       return;
     }
 
@@ -281,13 +363,15 @@ const CodeLab = () => {
       setError(
         "Please select a ZIP file."
       );
+
       return;
     }
 
     try {
       setAnalyzing(true);
 
-      const formData = new FormData();
+      const formData =
+        new FormData();
 
       formData.append(
         "projectZip",
@@ -299,10 +383,11 @@ const CodeLab = () => {
         selectedProject
       );
 
-      const response = await api.post(
-        "/code-analysis/analyze",
-        formData
-      );
+      const response =
+        await api.post(
+          "/code-analysis/analyze",
+          formData
+        );
 
       const analysis =
         response?.data?.data?.analysis ||
@@ -324,18 +409,19 @@ const CodeLab = () => {
         fileInput.value = "";
       }
 
-      // Refresh project analysis history
       const refreshedHistory =
         await fetchProjectAnalyses(
           selectedProject
         );
 
-      // Prefer returned analysis
       if (analysis?._id) {
-        setSelectedAnalysis(analysis);
+        setSelectedAnalysis(
+          analysis
+        );
 
         setAiReview(
-          analysis?.aiReview || null
+          analysis?.aiReview ||
+            null
         );
 
         setFixSuggestion(null);
@@ -345,10 +431,13 @@ const CodeLab = () => {
         const latest =
           refreshedHistory[0];
 
-        setSelectedAnalysis(latest);
+        setSelectedAnalysis(
+          latest
+        );
 
         setAiReview(
-          latest?.aiReview || null
+          latest?.aiReview ||
+            null
         );
       }
     } catch (err) {
@@ -367,68 +456,19 @@ const CodeLab = () => {
   };
 
   // =====================================================
-  // FETCH PROJECT ANALYSES
-  // =====================================================
-
-  const fetchProjectAnalyses = async (
-    projectId
-  ) => {
-    if (!projectId) {
-      return [];
-    }
-
-    try {
-      const response = await api.get(
-        `/code-analysis/project/${projectId}`
-      );
-
-      const history =
-        response?.data?.data?.analyses ||
-        response?.data?.analyses ||
-        (Array.isArray(response?.data?.data)
-          ? response.data.data
-          : []);
-
-      const safeHistory =
-        Array.isArray(history)
-          ? history
-          : [];
-
-      setAnalyses(safeHistory);
-
-      if (safeHistory.length > 0) {
-        setSelectedAnalysis(
-          safeHistory[0]
-        );
-
-        setAiReview(
-          safeHistory[0]?.aiReview ||
-            null
-        );
-      }
-
-      return safeHistory;
-    } catch (err) {
-      console.error(
-        "Failed to refresh project analyses:",
-        err
-      );
-
-      return [];
-    }
-  };
-
-  // =====================================================
   // SELECT ANALYSIS
   // =====================================================
 
   const selectAnalysis = (
     analysis
   ) => {
-    setSelectedAnalysis(analysis);
+    setSelectedAnalysis(
+      analysis
+    );
 
     setAiReview(
-      analysis?.aiReview || null
+      analysis?.aiReview ||
+        null
     );
 
     setFixSuggestion(null);
@@ -449,6 +489,7 @@ const CodeLab = () => {
       setError(
         "Please select an analysis first."
       );
+
       return;
     }
 
@@ -457,10 +498,11 @@ const CodeLab = () => {
       setError("");
       setSuccess("");
 
-      const response = await api.post(
-        `/code-analysis/${selectedAnalysis._id}/ai-review`,
-        {}
-      );
+      const response =
+        await api.post(
+          `/code-analysis/${selectedAnalysis._id}/ai-review`,
+          {}
+        );
 
       const review =
         response?.data?.data?.aiReview ||
@@ -483,14 +525,16 @@ const CodeLab = () => {
 
       setAnalyses(
         (previous) =>
-          previous.map((item) =>
-            item._id ===
-            selectedAnalysis._id
-              ? {
-                  ...item,
-                  aiReview: review,
-                }
-              : item
+          previous.map(
+            (item) =>
+              item._id ===
+              selectedAnalysis._id
+                ? {
+                    ...item,
+                    aiReview:
+                      review,
+                  }
+                : item
           )
       );
 
@@ -529,34 +573,35 @@ const CodeLab = () => {
       setError("");
       setSuccess("");
 
-      const response = await api.post(
-        "/code-analysis/fix-suggestion",
-        {
-          category:
-            finding.category,
+      const response =
+        await api.post(
+          "/code-analysis/fix-suggestion",
+          {
+            category:
+              finding.category,
 
-          severity:
-            finding.severity,
+            severity:
+              finding.severity,
 
-          title:
-            finding.title,
+            title:
+              finding.title,
 
-          description:
-            finding.description,
+            description:
+              finding.description,
 
-          file:
-            finding.file,
+            file:
+              finding.file,
 
-          line:
-            finding.line,
+            line:
+              finding.line,
 
-          suggestion:
-            finding.suggestion,
+            suggestion:
+              finding.suggestion,
 
-          code:
-            finding.code || "",
-        }
-      );
+            code:
+              finding.code || "",
+          }
+        );
 
       const data =
         response?.data?.data;
@@ -595,11 +640,14 @@ const CodeLab = () => {
   // =====================================================
 
   const createTaskFromRecommendation =
-    async (recommendationIndex) => {
+    async (
+      recommendationIndex
+    ) => {
       if (!selectedAnalysis?._id) {
         setError(
           "Please select an analysis first."
         );
+
         return;
       }
 
@@ -611,18 +659,20 @@ const CodeLab = () => {
         setError("");
         setSuccess("");
 
-        const response = await api.post(
-          "/ai-actions/create-task",
-          {
-            analysisId:
-              selectedAnalysis._id,
+        const response =
+          await api.post(
+            "/ai-actions/create-task",
+            {
+              analysisId:
+                selectedAnalysis._id,
 
-            recommendationIndex,
-          }
-        );
+              recommendationIndex,
+            }
+          );
 
         const taskData =
-          response?.data?.data || {};
+          response?.data?.data ||
+          {};
 
         setCreatedTasks(
           (previous) => ({
@@ -658,11 +708,14 @@ const CodeLab = () => {
   // =====================================================
 
   const createIssueFromFinding =
-    async (findingIndex) => {
+    async (
+      findingIndex
+    ) => {
       if (!selectedAnalysis?._id) {
         setError(
           "Please select an analysis first."
         );
+
         return;
       }
 
@@ -694,13 +747,15 @@ const CodeLab = () => {
           );
 
         const issueData =
-          response?.data?.data || {};
+          response?.data?.data ||
+          {};
 
         setCreatedIssues(
           (previous) => ({
             ...previous,
 
-            [findingIndex]: true,
+            [findingIndex]:
+              true,
           })
         );
 
@@ -756,29 +811,34 @@ const CodeLab = () => {
       const remaining =
         analyses.filter(
           (item) =>
-            item._id !== analysisId
+            item._id !==
+            analysisId
         );
 
-      setAnalyses(remaining);
+      setAnalyses(
+        remaining
+      );
 
       if (
         selectedAnalysis?._id ===
         analysisId
       ) {
-        setSelectedAnalysis(
+        const nextAnalysis =
           remaining.length > 0
             ? remaining[0]
-            : null
+            : null;
+
+        setSelectedAnalysis(
+          nextAnalysis
         );
 
         setAiReview(
-          remaining.length > 0
-            ? remaining[0]?.aiReview ||
-                null
-            : null
+          nextAnalysis?.aiReview ||
+            null
         );
 
         setFixSuggestion(null);
+
         setCreatedTasks({});
         setCreatedIssues({});
       }
@@ -912,16 +972,20 @@ const CodeLab = () => {
   // =====================================================
 
   const scores =
-    selectedAnalysis?.scores || {};
+    selectedAnalysis?.scores ||
+    {};
 
   const projectHealth =
-    selectedAnalysis?.projectHealth || {
+    selectedAnalysis?.projectHealth ||
+    {
       score:
-        scores.overall || 0,
+        scores.overall ||
+        0,
 
       status:
         getScoreLabel(
-          scores.overall || 0
+          scores.overall ||
+            0
         ).toLowerCase(),
 
       strongAreas: [],
@@ -931,19 +995,6 @@ const CodeLab = () => {
       recommendedAction:
         "Continue improving the project.",
     };
-
-  /*
-   * Support both:
-   *
-   * selectedAnalysis.testResults
-   *
-   * and:
-   *
-   * selectedAnalysis.testing.testResults
-   *
-   * This makes CodeLab compatible with
-   * either backend response structure.
-   */
 
   const testResults =
     selectedAnalysis?.testResults ||
@@ -964,7 +1015,7 @@ const CodeLab = () => {
     null;
 
   // =====================================================
-  // FINDINGS GROUPED BY SEVERITY
+  // GROUP FINDINGS
   // =====================================================
 
   const groupedFindings =
@@ -983,12 +1034,14 @@ const CodeLab = () => {
             finding?.severity?.toLowerCase() ||
             "info";
 
-          if (!groups[severity]) {
-            groups.info.push(
+          if (
+            groups[severity]
+          ) {
+            groups[severity].push(
               finding
             );
           } else {
-            groups[severity].push(
+            groups.info.push(
               finding
             );
           }
@@ -1011,7 +1064,9 @@ const CodeLab = () => {
         ================================================= */}
 
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+
           <div className="flex items-center gap-4">
+
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-purple-500/30 bg-purple-500/10">
               <BrainCircuit className="h-7 w-7 text-purple-400" />
             </div>
@@ -1026,6 +1081,7 @@ const CodeLab = () => {
                 its engineering health.
               </p>
             </div>
+
           </div>
 
           <button
@@ -1038,19 +1094,22 @@ const CodeLab = () => {
                     )
                 : fetchAnalyses
             }
-            disabled={loadingAnalyses}
+            disabled={
+              loadingAnalyses
+            }
             className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#0b111d] px-4 py-2.5 text-sm text-slate-300 transition hover:border-purple-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw
-              className={`h-4 w-4 ${
+              className={
                 loadingAnalyses
-                  ? "animate-spin"
-                  : ""
-              }`}
+                  ? "h-4 w-4 animate-spin"
+                  : "h-4 w-4"
+              }
             />
 
             Refresh
           </button>
+
         </div>
 
         {/* =================================================
@@ -1061,7 +1120,9 @@ const CodeLab = () => {
           <div className="mb-5 flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             <AlertTriangle className="h-5 w-5 shrink-0" />
 
-            <span>{error}</span>
+            <span>
+              {error}
+            </span>
           </div>
         )}
 
@@ -1069,13 +1130,14 @@ const CodeLab = () => {
           <div className="mb-5 flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
 
-            <span>{success}</span>
+            <span>
+              {success}
+            </span>
           </div>
         )}
 
         {/* =================================================
-            UPLOAD + HISTORY
-            MOVED TO COMPONENT
+            UPLOAD COMPONENT
         ================================================= */}
 
         <CodeLabUpload
@@ -1092,8 +1154,12 @@ const CodeLab = () => {
           loadingAnalyses={
             loadingAnalyses
           }
-          analyzing={analyzing}
-          analyses={analyses}
+          analyzing={
+            analyzing
+          }
+          analyses={
+            analyses
+          }
           selectedAnalysis={
             selectedAnalysis
           }
@@ -1123,9 +1189,11 @@ const CodeLab = () => {
             ================================================= */}
 
             <section className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
+
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 
                 <div>
+
                   <div className="mb-2 flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-purple-400" />
 
@@ -1143,18 +1211,23 @@ const CodeLab = () => {
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    {selectedAnalysis?.repositoryName ||
+                    {selectedAnalysis
+                      ?.repositoryName ||
                       "Repository analysis"}
                   </p>
+
                 </div>
 
                 <div className="text-left md:text-right">
+
                   <div
                     className={`text-6xl font-bold ${getScoreColor(
-                      scores.overall ?? 0
+                      scores.overall ??
+                        0
                     )}`}
                   >
-                    {scores.overall ?? 0}
+                    {scores.overall ??
+                      0}
 
                     <span className="ml-1 text-2xl text-slate-500">
                       /100
@@ -1163,16 +1236,20 @@ const CodeLab = () => {
 
                   <p
                     className={`mt-1 text-sm font-medium ${getScoreColor(
-                      scores.overall ?? 0
+                      scores.overall ??
+                        0
                     )}`}
                   >
                     {getScoreLabel(
-                      scores.overall ?? 0
+                      scores.overall ??
+                        0
                     )}
                   </p>
+
                 </div>
 
               </div>
+
             </section>
 
             {/* =================================================
@@ -1180,7 +1257,9 @@ const CodeLab = () => {
             ================================================= */}
 
             <section className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
+
               <div className="mb-6 flex items-center gap-3">
+
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10">
                   <Gauge className="h-5 w-5 text-emerald-400" />
                 </div>
@@ -1194,6 +1273,7 @@ const CodeLab = () => {
                     Overall engineering health of your repository.
                   </p>
                 </div>
+
               </div>
 
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
@@ -1201,9 +1281,11 @@ const CodeLab = () => {
                 {/* HEALTH SCORE */}
 
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-800 bg-[#080e19] p-6">
+
                   <div
                     className={`text-6xl font-bold ${getScoreColor(
-                      projectHealth.score ?? 0
+                      projectHealth.score ??
+                        0
                     )}`}
                   >
                     {projectHealth.score ??
@@ -1216,12 +1298,14 @@ const CodeLab = () => {
 
                   <div
                     className={`mt-4 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase ${getScoreColor(
-                      projectHealth.score ?? 0
+                      projectHealth.score ??
+                        0
                     )}`}
                   >
                     {projectHealth.status ||
                       "unknown"}
                   </div>
+
                 </div>
 
                 {/* HEALTH DETAILS */}
@@ -1231,6 +1315,7 @@ const CodeLab = () => {
                   {/* STRONG AREAS */}
 
                   <div>
+
                     <h3 className="mb-3 text-sm font-semibold text-white">
                       Strong Areas
                     </h3>
@@ -1238,7 +1323,9 @@ const CodeLab = () => {
                     {projectHealth
                       .strongAreas
                       ?.length > 0 ? (
+
                       <div className="space-y-2">
+
                         {projectHealth.strongAreas.map(
                           (
                             area,
@@ -1263,17 +1350,23 @@ const CodeLab = () => {
                             </div>
                           )
                         )}
+
                       </div>
+
                     ) : (
+
                       <p className="text-sm text-slate-500">
                         No strong areas identified yet.
                       </p>
+
                     )}
+
                   </div>
 
                   {/* WEAK AREAS */}
 
                   <div>
+
                     <h3 className="mb-3 text-sm font-semibold text-white">
                       Needs Improvement
                     </h3>
@@ -1281,7 +1374,9 @@ const CodeLab = () => {
                     {projectHealth
                       .weakAreas
                       ?.length > 0 ? (
+
                       <div className="space-y-2">
+
                         {projectHealth.weakAreas.map(
                           (
                             area,
@@ -1306,17 +1401,23 @@ const CodeLab = () => {
                             </div>
                           )
                         )}
+
                       </div>
+
                     ) : (
+
                       <p className="text-sm text-slate-500">
                         No weak areas detected.
                       </p>
+
                     )}
+
                   </div>
 
                   {/* RECOMMENDED ACTION */}
 
                   <div className="md:col-span-2">
+
                     <h3 className="mb-2 text-sm font-semibold text-white">
                       Recommended Action
                     </h3>
@@ -1325,15 +1426,17 @@ const CodeLab = () => {
                       {projectHealth.recommendedAction ||
                         "Continue maintaining the current engineering quality."}
                     </div>
+
                   </div>
 
                 </div>
+
               </div>
+
             </section>
 
             {/* =================================================
                 SCORE BREAKDOWN
-                MOVED TO COMPONENT
             ================================================= */}
 
             <ScoreBreakdown
@@ -1345,7 +1448,9 @@ const CodeLab = () => {
             ================================================= */}
 
             <section className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
+
               <div className="mb-6 flex items-center gap-3">
+
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
                   <FlaskConical className="h-5 w-5 text-blue-400" />
                 </div>
@@ -1359,14 +1464,19 @@ const CodeLab = () => {
                     Repository test execution and coverage.
                   </p>
                 </div>
+
               </div>
 
               {!testResults?.executed ? (
+
                 <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5">
+
                   <div className="flex gap-3">
+
                     <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-400" />
 
                     <div>
+
                       <p className="font-medium text-yellow-300">
                         Tests were not executed.
                       </p>
@@ -1375,13 +1485,16 @@ const CodeLab = () => {
                         {testResults?.reason ||
                           "No supported testing framework detected."}
                       </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
 
-                  {/* FRAMEWORK */}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              ) : (
+
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
 
                   <div className="rounded-xl border border-slate-800 bg-[#080e19] p-4">
                     <p className="text-xs text-slate-500">
@@ -1394,8 +1507,6 @@ const CodeLab = () => {
                     </p>
                   </div>
 
-                  {/* TOTAL */}
-
                   <div className="rounded-xl border border-slate-800 bg-[#080e19] p-4">
                     <p className="text-xs text-slate-500">
                       Total
@@ -1406,8 +1517,6 @@ const CodeLab = () => {
                         0}
                     </p>
                   </div>
-
-                  {/* PASSED */}
 
                   <div className="rounded-xl border border-emerald-500/10 bg-emerald-500/5 p-4">
                     <p className="text-xs text-slate-500">
@@ -1420,8 +1529,6 @@ const CodeLab = () => {
                     </p>
                   </div>
 
-                  {/* FAILED */}
-
                   <div className="rounded-xl border border-red-500/10 bg-red-500/5 p-4">
                     <p className="text-xs text-slate-500">
                       Failed
@@ -1433,27 +1540,18 @@ const CodeLab = () => {
                     </p>
                   </div>
 
-                  {/* PASS RATE */}
-
                   <div className="rounded-xl border border-slate-800 bg-[#080e19] p-4">
                     <p className="text-xs text-slate-500">
                       Pass Rate
                     </p>
 
                     <p className="mt-2 text-xl font-bold text-blue-400">
-                      {testResults?.total
-                        ? Math.round(
-                            ((testResults?.passed ||
-                              0) /
-                              testResults.total) *
-                              100
-                          )
-                        : 0}
+                      {testResults?.passRate ??
+                        testResults?.accuracy ??
+                        0}
                       %
                     </p>
                   </div>
-
-                  {/* COVERAGE */}
 
                   <div className="rounded-xl border border-slate-800 bg-[#080e19] p-4">
                     <p className="text-xs text-slate-500">
@@ -1468,7 +1566,9 @@ const CodeLab = () => {
                   </div>
 
                 </div>
+
               )}
+
             </section>
 
             {/* =================================================
@@ -1480,11 +1580,16 @@ const CodeLab = () => {
               {/* REPOSITORY */}
 
               <div className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
-                <p className="text-xs uppercase tracking-wider text-slate-500">
-                  Repository
-                </p>
 
-                <p className="mt-2 break-all text-sm font-medium text-white">
+                <div className="flex items-center gap-3">
+                  <FolderGit2 className="h-5 w-5 text-purple-400" />
+
+                  <p className="text-xs uppercase tracking-wider text-slate-500">
+                    Repository
+                  </p>
+                </div>
+
+                <p className="mt-3 break-all text-sm font-medium text-white">
                   {selectedAnalysis?.repositoryName ||
                     "Unknown repository"}
                 </p>
@@ -1514,11 +1619,13 @@ const CodeLab = () => {
                   </div>
 
                 </div>
+
               </div>
 
               {/* DOCUMENTATION */}
 
               <div className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
+
                 <p className="text-xs uppercase tracking-wider text-slate-500">
                   Documentation
                 </p>
@@ -1580,11 +1687,13 @@ const CodeLab = () => {
                   </div>
 
                 </div>
+
               </div>
 
               {/* DEPENDENCIES */}
 
               <div className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
+
                 <p className="text-xs uppercase tracking-wider text-slate-500">
                   Dependencies
                 </p>
@@ -1645,6 +1754,7 @@ const CodeLab = () => {
                   </div>
 
                 </div>
+
               </div>
 
             </section>
@@ -1656,6 +1766,7 @@ const CodeLab = () => {
             <section className="rounded-2xl border border-slate-800 bg-[#0b111d] p-6">
 
               <div className="mb-6 flex items-center justify-between">
+
                 <div>
                   <h2 className="text-lg font-semibold">
                     Findings
@@ -1667,19 +1778,30 @@ const CodeLab = () => {
                 </div>
 
                 <span className="rounded-full border border-slate-800 bg-[#080e19] px-3 py-1 text-xs text-slate-400">
-                  {findings.length} findings
+                  {findings.length}{" "}
+                  {findings.length ===
+                  1
+                    ? "finding"
+                    : "findings"}
                 </span>
+
               </div>
 
-              {findings.length === 0 ? (
+              {findings.length ===
+              0 ? (
+
                 <div className="rounded-xl border border-dashed border-slate-800 bg-[#080e19] p-8 text-center">
+
                   <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-400" />
 
                   <p className="mt-3 text-sm font-medium text-white">
-                    No findings detected
+                    No significant issues detected.
                   </p>
+
                 </div>
+
               ) : (
+
                 <div className="space-y-6">
 
                   {[
@@ -1690,6 +1812,7 @@ const CodeLab = () => {
                     "info",
                   ].map(
                     (severity) => {
+
                       const severityFindings =
                         groupedFindings[
                           severity
@@ -1707,7 +1830,9 @@ const CodeLab = () => {
                             severity
                           }
                         >
+
                           <div className="mb-3 flex items-center gap-2">
+
                             {getSeverityIcon(
                               severity
                             )}
@@ -1721,6 +1846,7 @@ const CodeLab = () => {
                                 severityFindings.length
                               }
                             </span>
+
                           </div>
 
                           <div className="space-y-3">
@@ -1729,6 +1855,7 @@ const CodeLab = () => {
                               (
                                 finding
                               ) => {
+
                                 const originalIndex =
                                   findings.indexOf(
                                     finding
@@ -1742,6 +1869,7 @@ const CodeLab = () => {
                                     }
                                     className="rounded-xl border border-slate-800 bg-[#080e19] p-5"
                                   >
+
                                     <div className="flex gap-4">
 
                                       <div className="mt-0.5">
@@ -1822,18 +1950,22 @@ const CodeLab = () => {
                                             }
                                             className="flex items-center gap-2 rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-2.5 text-sm font-medium text-purple-300 transition hover:bg-purple-500/20 disabled:cursor-not-allowed disabled:opacity-50"
                                           >
+
                                             {fixLoading ===
                                             originalIndex ? (
                                               <>
                                                 <RefreshCw className="h-4 w-4 animate-spin" />
+
                                                 Generating...
                                               </>
                                             ) : (
                                               <>
                                                 <Sparkles className="h-4 w-4" />
+
                                                 Ask Genome AI
                                               </>
                                             )}
+
                                           </button>
 
                                           {/* CREATE ISSUE */}
@@ -1841,15 +1973,19 @@ const CodeLab = () => {
                                           {createdIssues[
                                             originalIndex
                                           ] ? (
+
                                             <button
                                               type="button"
                                               disabled
                                               className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2.5 text-sm font-medium text-emerald-400"
                                             >
                                               <CheckCircle2 className="h-4 w-4" />
+
                                               Issue Created
                                             </button>
+
                                           ) : (
+
                                             <button
                                               type="button"
                                               disabled={
@@ -1863,37 +1999,46 @@ const CodeLab = () => {
                                               }
                                               className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
                                             >
+
                                               {issueLoading ===
                                               originalIndex ? (
                                                 <>
                                                   <RefreshCw className="h-4 w-4 animate-spin" />
+
                                                   Creating...
                                                 </>
                                               ) : (
                                                 <>
                                                   <Plus className="h-4 w-4" />
+
                                                   Create Issue
                                                 </>
                                               )}
+
                                             </button>
+
                                           )}
 
                                         </div>
 
                                       </div>
+
                                     </div>
+
                                   </div>
                                 );
                               }
                             )}
 
                           </div>
+
                         </div>
                       );
                     }
                   )}
 
                 </div>
+
               )}
 
             </section>
@@ -1986,17 +2131,17 @@ const CodeLab = () => {
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-slate-400">
-                      The Fix Suggestion API is currently
-                      preparing structured AI context.
-                      Connect this endpoint to the
-                      existing Genome AI provider to
-                      generate the final explanation and
+                      The Fix Suggestion API has prepared
+                      structured AI context. Your existing
+                      Genome AI provider can use this prompt
+                      to generate the final explanation and
                       corrected code.
                     </p>
 
                   </div>
 
                 </div>
+
               </section>
             )}
 
@@ -2031,12 +2176,16 @@ const CodeLab = () => {
                   onClick={
                     generateAIReview
                   }
-                  disabled={aiLoading}
+                  disabled={
+                    aiLoading
+                  }
                   className="flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
+
                   {aiLoading ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin" />
+
                       Generating...
                     </>
                   ) : (
@@ -2048,11 +2197,13 @@ const CodeLab = () => {
                         : "Generate AI Review"}
                     </>
                   )}
+
                 </button>
 
               </div>
 
               {!currentAiReview ? (
+
                 <div className="mt-8 rounded-2xl border border-dashed border-slate-800 bg-[#080e19] p-10 text-center">
 
                   <BrainCircuit className="mx-auto h-10 w-10 text-purple-400" />
@@ -2068,7 +2219,9 @@ const CodeLab = () => {
                   </p>
 
                 </div>
+
               ) : (
+
                 <div className="mt-8 space-y-7">
 
                   {/* SUMMARY */}
@@ -2093,15 +2246,19 @@ const CodeLab = () => {
 
                   {currentAiReview
                     .strengths
-                    ?.length > 0 && (
+                    ?.length >
+                    0 && (
+
                     <div>
 
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                         <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+
                         Strengths
                       </h3>
 
                       <div className="space-y-2">
+
                         {currentAiReview.strengths.map(
                           (
                             item,
@@ -2118,6 +2275,7 @@ const CodeLab = () => {
                             </div>
                           )
                         )}
+
                       </div>
 
                     </div>
@@ -2127,15 +2285,19 @@ const CodeLab = () => {
 
                   {currentAiReview
                     .weaknesses
-                    ?.length > 0 && (
+                    ?.length >
+                    0 && (
+
                     <div>
 
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                         <AlertTriangle className="h-4 w-4 text-yellow-400" />
+
                         Weaknesses
                       </h3>
 
                       <div className="space-y-2">
+
                         {currentAiReview.weaknesses.map(
                           (
                             item,
@@ -2152,6 +2314,7 @@ const CodeLab = () => {
                             </div>
                           )
                         )}
+
                       </div>
 
                     </div>
@@ -2161,15 +2324,19 @@ const CodeLab = () => {
 
                   {currentAiReview
                     .criticalRisks
-                    ?.length > 0 && (
+                    ?.length >
+                    0 && (
+
                     <div>
 
                       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                         <XCircle className="h-4 w-4 text-red-400" />
+
                         Critical Risks
                       </h3>
 
                       <div className="space-y-3">
+
                         {currentAiReview.criticalRisks.map(
                           (
                             risk,
@@ -2208,6 +2375,7 @@ const CodeLab = () => {
                             </div>
                           )
                         )}
+
                       </div>
 
                     </div>
@@ -2217,13 +2385,16 @@ const CodeLab = () => {
 
                   {currentAiReview
                     .recommendations
-                    ?.length > 0 && (
+                    ?.length >
+                    0 && (
+
                     <div>
 
                       <div className="mb-4">
 
                         <h3 className="flex items-center gap-2 text-sm font-semibold">
                           <Sparkles className="h-4 w-4 text-purple-400" />
+
                           Recommendations
                         </h3>
 
@@ -2241,6 +2412,7 @@ const CodeLab = () => {
                             recommendation,
                             index
                           ) => (
+
                             <div
                               key={
                                 recommendation._id ||
@@ -2311,15 +2483,19 @@ const CodeLab = () => {
                                 {createdTasks[
                                   index
                                 ] ? (
+
                                   <button
                                     type="button"
                                     disabled
                                     className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-400"
                                   >
                                     <CheckCircle2 className="h-4 w-4" />
+
                                     Task Created
                                   </button>
+
                                 ) : (
+
                                   <button
                                     type="button"
                                     disabled={
@@ -2333,28 +2509,35 @@ const CodeLab = () => {
                                     }
                                     className="flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
                                   >
+
                                     {taskLoading ===
                                     index ? (
                                       <>
                                         <RefreshCw className="h-4 w-4 animate-spin" />
+
                                         Creating...
                                       </>
                                     ) : (
                                       <>
                                         <Plus className="h-4 w-4" />
+
                                         Create Task
                                       </>
                                     )}
+
                                   </button>
+
                                 )}
 
                               </div>
 
                             </div>
+
                           )
                         )}
 
                       </div>
+
                     </div>
                   )}
 
@@ -2411,6 +2594,7 @@ const CodeLab = () => {
                             }
                             className="rounded-xl border border-slate-800 bg-[#080e19] p-5"
                           >
+
                             <h4 className="text-sm font-semibold text-white">
                               {
                                 review.title
@@ -2422,6 +2606,7 @@ const CodeLab = () => {
                                 review.value
                               }
                             </p>
+
                           </div>
                         )
                     )}
@@ -2429,7 +2614,9 @@ const CodeLab = () => {
                   </div>
 
                 </div>
+
               )}
+
             </section>
 
             {/* =================================================
@@ -2456,6 +2643,7 @@ const CodeLab = () => {
 
           </div>
         )}
+
       </div>
     </div>
   );
