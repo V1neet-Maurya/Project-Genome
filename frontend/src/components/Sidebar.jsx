@@ -14,6 +14,7 @@ import {
   UserRound,
   ChevronRight,
   BrainCircuit,
+  FlaskConical,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -141,6 +142,26 @@ const Sidebar = ({
         "border-cyan-500/30 bg-cyan-500/[0.07]",
 
       activeText: "text-cyan-300",
+    },
+
+    // =====================================================
+    // CODELAB
+    // =====================================================
+
+    {
+      name: "CodeLab",
+      path: "/codelab",
+      icon: FlaskConical,
+
+      iconColor: "text-emerald-200",
+
+      iconBg:
+        "bg-gradient-to-br from-emerald-500/30 to-teal-500/10 border-emerald-400/30 shadow-[0_0_22px_rgba(16,185,129,0.20)]",
+
+      active:
+        "border-emerald-500/30 bg-gradient-to-r from-emerald-500/[0.12] to-teal-500/[0.06] shadow-[0_0_25px_rgba(16,185,129,0.10)]",
+
+      activeText: "text-emerald-300",
     },
 
     // =====================================================
@@ -394,9 +415,7 @@ const Sidebar = ({
           </div>
 
           <div className="space-y-2">
-            {navItems.map(
-              renderNavItem
-            )}
+            {navItems.map(renderNavItem)}
           </div>
 
           {/* DIVIDER */}
