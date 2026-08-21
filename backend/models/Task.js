@@ -20,6 +20,16 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
 
+    // =====================================================
+    // MILESTONE
+    // =====================================================
+
+    milestone: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Milestone",
+      default: null,
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -34,13 +44,23 @@ const taskSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["todo", "in-progress", "in-review", "completed"],
+      enum: [
+        "todo",
+        "in-progress",
+        "in-review",
+        "completed",
+      ],
       default: "todo",
     },
 
     priority: {
       type: String,
-      enum: ["low", "medium", "high", "critical"],
+      enum: [
+        "low",
+        "medium",
+        "high",
+        "critical",
+      ],
       default: "medium",
     },
 
@@ -61,6 +81,9 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-const Task = mongoose.model("Task", taskSchema);
+const Task = mongoose.model( 
+  "Task",
+  taskSchema
+);
 
-export default Task; 
+export default Task;

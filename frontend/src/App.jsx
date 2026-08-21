@@ -12,7 +12,6 @@ import {
 import { useDispatch } from "react-redux";
 
 import AppLayout from "./layouts/AppLayout";
-
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import {
@@ -44,6 +43,8 @@ import Documents from "./pages/Documents";
 import Activity from "./pages/Activity";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
+import AI from "./pages/AI";
+import CodeLab from "./pages/CodeLab";
 
 // =====================================================
 // ERROR PAGES
@@ -162,7 +163,6 @@ function App() {
 
   return (
     <Routes>
-
       {/* =================================================
           DEFAULT ROUTE
       ================================================= */}
@@ -203,78 +203,106 @@ function App() {
       ================================================= */}
 
       <Route element={<ProtectedRoute />}>
-
-        {/* =================================================
-            APPLICATION LAYOUT
-        ================================================= */}
-
         <Route element={<AppLayout />}>
-
-          {/* DASHBOARD */}
+          {/* =================================================
+              DASHBOARD
+          ================================================= */}
 
           <Route
             path="/dashboard"
             element={<Dashboard />}
           />
 
-          {/* PROJECTS */}
+          {/* =================================================
+              PROJECTS
+          ================================================= */}
 
           <Route
             path="/projects"
             element={<Projects />}
           />
 
-          {/* TASKS */}
+          {/* =================================================
+              TASKS
+          ================================================= */}
 
           <Route
             path="/tasks"
             element={<Tasks />}
           />
 
-          {/* ISSUES */}
+          {/* =================================================
+              ISSUES
+          ================================================= */}
 
           <Route
             path="/issues"
             element={<Issues />}
           />
 
-          {/* TEAM */}
+          {/* =================================================
+              TEAM
+          ================================================= */}
 
           <Route
             path="/team"
             element={<Team />}
           />
 
-          {/* DOCUMENTS */}
+          {/* =================================================
+              DOCUMENTS
+          ================================================= */}
 
           <Route
             path="/documents"
             element={<Documents />}
           />
 
-          {/* ACTIVITY */}
+          {/* =================================================
+              ACTIVITY
+          ================================================= */}
 
           <Route
             path="/activity"
             element={<Activity />}
           />
 
-          {/* SETTINGS */}
+          {/* =================================================
+              SETTINGS
+          ================================================= */}
 
           <Route
             path="/settings"
             element={<Settings />}
           />
 
-          {/* ANALYTICS */}
+          {/* =================================================
+              ANALYTICS
+          ================================================= */}
 
           <Route
             path="/analytics"
             element={<Analytics />}
           />
 
-        </Route>
+          {/* =================================================
+              AI
+          ================================================= */}
 
+          <Route
+            path="/ai"
+            element={<AI />}
+          />
+
+          {/* =================================================
+              CODELAB
+          ================================================= */}
+
+          <Route
+            path="/codelab"
+            element={<CodeLab />}
+          />
+        </Route>
       </Route>
 
       {/* =================================================
@@ -285,7 +313,6 @@ function App() {
         path="*"
         element={<NotFound />}
       />
-
     </Routes>
   );
 }

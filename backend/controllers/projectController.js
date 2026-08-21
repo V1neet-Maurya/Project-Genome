@@ -22,19 +22,17 @@ const createProject = async (req, res) => {
       });
     }
 
-    // Logged-in user becomes the project owner
     const project = await Project.create({
       name: name.trim(),
       description: description || "",
       status: status || "planning",
       visibility: visibility || "private",
-
       technologies: Array.isArray(technologies)
         ? technologies
         : [],
-
       deadline: deadline || undefined,
 
+      // Logged-in user becomes owner
       owner: req.user._id,
 
       members: [],
@@ -76,34 +74,108 @@ const createProject = async (req, res) => {
 
 const getProjects = async (req, res) => {
   try {
+    const userId = req.user._id;
+
     console.log(
-      "GET PROJECTS - USER ID:",
-      req.user._id
+      "=========================================="
+    );
+    console.log(
+      "GET PROJECTS"
+    );
+    console.log(
+      "Authenticated User:",
+      userId
     );
 
-    const projects = await Project.find({
-      $or: [
-        {
-          owner: req.user._id,
-        },
-        {
-          "members.user": req.user._id,
-        },
-      ],
-    })
-      .populate(
-        "owner",
-        "firstName lastName email role profilePic"
-      )
-      .populate(
-        "members.user",
-        "firstName lastName email role profilePic"
-      )
-      .sort({ createdAt: -1 });
+    // -----------------------------------------
+    // Projects owned by user
+    // -----------------------------------------
+
+    const ownedProjects =
+      await Project.find({
+        owner: userId,
+      })
+        .populate(
+          "owner",
+          "firstName lastName email role profilePic"
+        )
+        .populate(
+          "members.user",
+          "firstName lastName email role profilePic"
+        )
+        .sort({
+          createdAt: -1,
+        });
 
     console.log(
-      "GET PROJECTS - COUNT:",
+      "Owned projects:",
+      ownedProjects.length
+    );
+
+    // -----------------------------------------
+    // Projects where user is a member
+    // -----------------------------------------
+
+    const memberProjects =
+      await Project.find({
+        "members.user": userId,
+      })
+        .populate(
+          "owner",
+          "firstName lastName email role profilePic"
+        )
+        .populate(
+          "members.user",
+          "firstName lastName email role profilePic"
+        )
+        .sort({
+          createdAt: -1,
+        });
+
+    console.log(
+      "Member projects:",
+      memberProjects.length
+    );
+
+    // -----------------------------------------
+    // Combine without duplicates
+    // -----------------------------------------
+
+    const projectMap = new Map();
+
+    ownedProjects.forEach((project) => {
+      projectMap.set(
+        project._id.toString(),
+        project
+      );
+    });
+
+    memberProjects.forEach((project) => {
+      projectMap.set(
+        project._id.toString(),
+        project
+      );
+    });
+
+    const projects = Array.from(
+      projectMap.values()
+    );
+
+    console.log(
+      "Total accessible projects:",
       projects.length
+    );
+
+    console.log(
+      "Projects:",
+      projects.map((project) => ({
+        id: project._id,
+        name: project.name,
+      }))
+    );
+
+    console.log(
+      "=========================================="
     );
 
     return res.status(200).json({
@@ -211,6 +283,14 @@ const updateProject = async (req, res) => {
     }
 
     if (name !== undefined) {
+      if (!name.trim()) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Project name cannot be empty.",
+        });
+      }
+
       project.name = name.trim();
     }
 

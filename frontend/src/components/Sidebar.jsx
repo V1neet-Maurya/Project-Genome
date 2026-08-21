@@ -13,6 +13,7 @@ import {
   Sparkles,
   UserRound,
   ChevronRight,
+  BrainCircuit,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -140,6 +141,26 @@ const Sidebar = ({
         "border-cyan-500/30 bg-cyan-500/[0.07]",
 
       activeText: "text-cyan-300",
+    },
+
+    // =====================================================
+    // GENOME AI
+    // =====================================================
+
+    {
+      name: "Genome AI",
+      path: "/ai",
+      icon: BrainCircuit,
+
+      iconColor: "text-fuchsia-200",
+
+      iconBg:
+        "bg-gradient-to-br from-fuchsia-500/30 to-violet-500/10 border-fuchsia-400/30 shadow-[0_0_22px_rgba(217,70,239,0.20)]",
+
+      active:
+        "border-fuchsia-500/30 bg-fuchsia-500/[0.07]",
+
+      activeText: "text-fuchsia-300",
     },
   ];
 

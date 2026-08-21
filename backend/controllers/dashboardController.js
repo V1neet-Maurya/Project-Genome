@@ -2,9 +2,16 @@ import Project from "../models/Project.js";
 import Task from "../models/Task.js";
 import Issue from "../models/Issue.js";
 
+import CodeAnalysis from "../models/CodeAnalysis.js";
+import ProjectRisk from "../models/ProjectRisk.js";
+import DeadlinePrediction from "../models/DeadlinePrediction.js";
+import TeamWorkload from "../models/TeamWorkload.js";
+
 export const getDashboard = async (req, res, next) => {
   try {
-    console.log("🔥 NEW DASHBOARD CONTROLLER RUNNING");
+    console.log(
+      "🔥 NEW DASHBOARD CONTROLLER RUNNING"
+    );
 
     const userId = req.user._id;
 
@@ -81,7 +88,8 @@ export const getDashboard = async (req, res, next) => {
     const totalTasks = tasks.length;
 
     const todoTasks = tasks.filter(
-      (task) => task.status === "todo"
+      (task) =>
+        task.status === "todo"
     ).length;
 
     const inProgressTasks = tasks.filter(
@@ -143,13 +151,15 @@ export const getDashboard = async (req, res, next) => {
         );
       }
 
-      project.members?.forEach((member) => {
-        if (member.user) {
-          teamMemberIds.add(
-            member.user.toString()
-          );
+      project.members?.forEach(
+        (member) => {
+          if (member.user) {
+            teamMemberIds.add(
+              member.user.toString()
+            );
+          }
         }
-      });
+      );
     });
 
     const totalTeamMembers =
@@ -183,7 +193,8 @@ export const getDashboard = async (req, res, next) => {
               task.project?._id?.toString();
 
             return (
-              taskProjectId === projectId
+              taskProjectId ===
+              projectId
             );
           });
 
@@ -193,7 +204,8 @@ export const getDashboard = async (req, res, next) => {
         const completedProjectTasks =
           projectTasks.filter(
             (task) =>
-              task.status === "completed"
+              task.status ===
+              "completed"
           ).length;
 
         const progress =
@@ -210,13 +222,11 @@ export const getDashboard = async (req, res, next) => {
           name: project.name,
           owner: project.owner,
           members: project.members,
-          createdAt: project.createdAt,
-
+          createdAt:
+            project.createdAt,
           progress,
-
           totalTasks:
             totalProjectTasks,
-
           completedTasks:
             completedProjectTasks,
         };
@@ -248,6 +258,87 @@ export const getDashboard = async (req, res, next) => {
       issues.slice(0, 5);
 
     // =====================================================
+    // AI DASHBOARD DATA
+    // =====================================================
+
+    let codeAnalysis = [];
+    let projectRisk = [];
+    let deadlinePrediction = [];
+    let teamWorkload = [];
+
+    // =====================================================
+    // LATEST CODE ANALYSIS
+    // =====================================================
+
+    if (projectIds.length > 0) {
+      codeAnalysis =
+        await CodeAnalysis.find({
+          project: {
+            $in: projectIds,
+          },
+        })
+          .sort({
+            createdAt: -1,
+          })
+          .limit(10)
+          .lean();
+    }
+
+    // =====================================================
+    // LATEST PROJECT RISKS
+    // =====================================================
+
+    if (projectIds.length > 0) {
+      projectRisk =
+        await ProjectRisk.find({
+          project: {
+            $in: projectIds,
+          },
+        })
+          .sort({
+            createdAt: -1,
+          })
+          .limit(10)
+          .lean();
+    }
+
+    // =====================================================
+    // LATEST DEADLINE PREDICTIONS
+    // =====================================================
+
+    if (projectIds.length > 0) {
+      deadlinePrediction =
+        await DeadlinePrediction.find({
+          project: {
+            $in: projectIds,
+          },
+        })
+          .sort({
+            createdAt: -1,
+          })
+          .limit(10)
+          .lean();
+    }
+
+    // =====================================================
+    // LATEST TEAM WORKLOAD
+    // =====================================================
+
+    if (projectIds.length > 0) {
+      teamWorkload =
+        await TeamWorkload.find({
+          project: {
+            $in: projectIds,
+          },
+        })
+          .sort({
+            createdAt: -1,
+          })
+          .limit(10)
+          .lean();
+    }
+
+    // =====================================================
     // FINAL RESPONSE
     // =====================================================
 
@@ -255,8 +346,12 @@ export const getDashboard = async (req, res, next) => {
       success: true,
 
       data: {
-        // ⭐ IMPORTANT
-        projects: projectData,
+        // =================================================
+        // EXISTING DASHBOARD DATA
+        // =================================================
+
+        projects:
+          projectData,
 
         stats: {
           projects:
@@ -314,6 +409,18 @@ export const getDashboard = async (req, res, next) => {
         recentTasks,
 
         recentIssues,
+
+        // =================================================
+        // AI / PROJECT INTELLIGENCE DATA
+        // =================================================
+
+        codeAnalysis,
+
+        projectRisk,
+
+        deadlinePrediction,
+
+        teamWorkload,
       },
     });
   } catch (error) {

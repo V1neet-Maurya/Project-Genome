@@ -19,7 +19,10 @@ import {
 
 const router = express.Router();
 
-// CREATE
+// =====================================================
+// CREATE PROJECT
+// =====================================================
+
 router.post(
   "/",
   authMiddleware,
@@ -27,21 +30,30 @@ router.post(
   createProject
 );
 
-// GET ALL
+// =====================================================
+// GET ALL ACCESSIBLE PROJECTS
+// =====================================================
+
 router.get(
   "/",
   authMiddleware,
   getProjects
 );
 
-// GET ONE
+// =====================================================
+// GET SINGLE PROJECT
+// =====================================================
+
 router.get(
   "/:id",
   authMiddleware,
   getProjectById
 );
 
-// UPDATE
+// =====================================================
+// UPDATE PROJECT
+// =====================================================
+
 router.put(
   "/:id",
   authMiddleware,
@@ -49,7 +61,10 @@ router.put(
   updateProject
 );
 
-// DELETE
+// =====================================================
+// DELETE PROJECT
+// =====================================================
+
 router.delete(
   "/:id",
   authMiddleware,

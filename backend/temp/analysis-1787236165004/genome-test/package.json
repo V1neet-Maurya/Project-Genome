@@ -1,0 +1,9 @@
+{
+  "name": "genome-test-project",
+  "version": "1.0.0",
+  "description": "Small project for Genome code analysis testing",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}

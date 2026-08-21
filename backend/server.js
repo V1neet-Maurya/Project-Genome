@@ -31,6 +31,21 @@ import documentRoutes from "./routes/documentRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
+import milestoneRoutes from "./routes/milestoneRoutes.js";
+import aiActionRoutes from "./routes/aiActionRoutes.js";
+import codeAnalysisRoutes from "./routes/codeAnalysisRoutes.js";
+import taskGenerationRoutes from "./routes/taskGenerationRoutes.js";
+
+// =====================================================
+// AI PROJECT INTELLIGENCE ROUTES
+// =====================================================
+
+import deadlinePredictionRoutes from "./routes/deadlinePredictionRoutes.js";
+import workloadRoutes from "./routes/workloadRoutes.js";
+import projectSummaryRoutes from "./routes/projectSummaryRoutes.js";
+import projectPlannerRoutes from "./routes/projectPlannerRoutes.js";
+import assistantRoutes from "./routes/assistantRoutes.js";
 
 // =====================================================
 // CONFIG
@@ -52,17 +67,13 @@ app.use(helmet());
 // =====================================================
 
 const allowedOrigins = [
-  // Local development
   "http://localhost:5173",
   "http://localhost:5174",
 
-  // Current Vercel deployment
   "https://project-genome-od2xpkrky-v1neet-mauryas-projects.vercel.app",
 
-  // Vercel production domain
   "https://project-genome-three.vercel.app",
 
-  // Render environment variable
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -118,12 +129,6 @@ const corsOptions = {
 // APPLY CORS
 // =====================================================
 
-// IMPORTANT:
-// Do NOT use:
-// app.options("*", cors(corsOptions));
-//
-// Express/router version used by Render rejects "*".
-
 app.use(cors(corsOptions));
 
 // =====================================================
@@ -167,67 +172,15 @@ app.use(
 app.use(morgan("dev"));
 
 // =====================================================
-// HTTP SERVER
-// =====================================================
-
-const server = http.createServer(app);
-
-// =====================================================
-// SOCKET.IO
-// =====================================================
-
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-
-    methods: [
-      "GET",
-      "POST",
-    ],
-
-    credentials: true,
-  },
-});
-
-app.set("io", io);
-
-io.on("connection", (socket) => {
-  console.log(
-    "Socket connected:",
-    socket.id
-  );
-
-  socket.on("join-user", (userId) => {
-    if (!userId) {
-      return;
-    }
-
-    socket.join(`user:${userId}`);
-
-    console.log(
-      `User ${userId} joined room`
-    );
-  });
-
-  socket.on("disconnect", () => {
-    console.log(
-      "Socket disconnected:",
-      socket.id
-    );
-  });
-});
-
-// =====================================================
 // HEALTH CHECK
 // =====================================================
 
 app.get(
   "/api/v1/health",
   (req, res) => {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message:
-        "Genome API is running",
+      message: "Genome API is running",
     });
   }
 );
@@ -332,6 +285,96 @@ app.use(
 );
 
 // =====================================================
+// GENERAL AI ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/ai",
+  aiRoutes
+);
+
+// =====================================================
+// MILESTONE ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/milestones",
+  milestoneRoutes
+);
+
+// =====================================================
+// CODE ANALYSIS ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/code-analysis",
+  codeAnalysisRoutes
+);
+
+// =====================================================
+// AI ACTION ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/ai-actions",
+  aiActionRoutes
+);
+
+// =====================================================
+// AI TASK GENERATION ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/ai/task-generation",
+  taskGenerationRoutes
+);
+
+// =====================================================
+// DEADLINE PREDICTION ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/deadline-prediction",
+  deadlinePredictionRoutes
+);
+
+// =====================================================
+// WORKLOAD ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/workload",
+  workloadRoutes
+);
+
+// =====================================================
+// PROJECT SUMMARY ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/project-summary",
+  projectSummaryRoutes
+);
+
+// =====================================================
+// AI PROJECT PLANNER ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/ai/project-planner",
+  projectPlannerRoutes
+);
+
+// =====================================================
+// AI ASSISTANT ROUTES
+// =====================================================
+
+app.use(
+  "/api/v1/ai/assistant",
+  assistantRoutes
+);
+
+// =====================================================
 // USER ROUTES
 // =====================================================
 
@@ -347,15 +390,14 @@ app.use(
 app.get(
   "/api/v1/test-token",
   (req, res) => {
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
 
       jwtSecretLoaded:
         !!process.env.JWT_SECRET,
 
       jwtSecretLength:
-        process.env.JWT_SECRET?.length ||
-        0,
+        process.env.JWT_SECRET?.length || 0,
     });
   }
 );
@@ -371,7 +413,7 @@ app.get(
       const result =
         await cloudinary.api.ping();
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: result,
       });
@@ -381,7 +423,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
 
         message:
@@ -410,15 +452,12 @@ app.get(
         await cloudinary.uploader.upload(
           "https://res.cloudinary.com/demo/image/upload/sample.jpg",
           {
-            folder:
-              "genome/test",
-
-            resource_type:
-              "image",
+            folder: "genome/test",
+            resource_type: "image",
           }
         );
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: result,
       });
@@ -428,7 +467,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
 
         message:
@@ -447,15 +486,14 @@ app.get(
 
 // =====================================================
 // 404 HANDLER
-// MUST COME AFTER ALL ROUTES
+// MUST ALWAYS BE AFTER ALL ROUTES
 // =====================================================
 
 app.use(
   (req, res) => {
     return res.status(404).json({
       success: false,
-      message:
-        "API route not found",
+      message: "API route not found",
     });
   }
 );
@@ -466,6 +504,69 @@ app.use(
 // =====================================================
 
 app.use(errorMiddleware);
+
+// =====================================================
+// HTTP SERVER
+// =====================================================
+
+const server =
+  http.createServer(app);
+
+// =====================================================
+// SOCKET.IO
+// =====================================================
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+
+    methods: [
+      "GET",
+      "POST",
+    ],
+
+    credentials: true,
+  },
+});
+
+app.set("io", io);
+
+io.on(
+  "connection",
+  (socket) => {
+    console.log(
+      "Socket connected:",
+      socket.id
+    );
+
+    socket.on(
+      "join-user",
+      (userId) => {
+        if (!userId) {
+          return;
+        }
+
+        socket.join(
+          `user:${userId}`
+        );
+
+        console.log(
+          `User ${userId} joined room`
+        );
+      }
+    );
+
+    socket.on(
+      "disconnect",
+      () => {
+        console.log(
+          "Socket disconnected:",
+          socket.id
+        );
+      }
+    );
+  }
+);
 
 // =====================================================
 // START SERVER

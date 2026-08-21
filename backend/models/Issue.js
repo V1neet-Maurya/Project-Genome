@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const issueSchema = new mongoose.Schema(
   {
+    // ==========================================
+    // BASIC ISSUE INFORMATION
+    // ==========================================
+
     title: {
       type: String,
       required: true,
@@ -14,11 +18,19 @@ const issueSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // ==========================================
+    // PROJECT
+    // ==========================================
+
     project: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
       required: true,
     },
+
+    // ==========================================
+    // USERS
+    // ==========================================
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,6 +44,10 @@ const issueSchema = new mongoose.Schema(
       default: null,
     },
 
+    // ==========================================
+    // STATUS
+    // ==========================================
+
     status: {
       type: String,
       enum: [
@@ -42,6 +58,10 @@ const issueSchema = new mongoose.Schema(
       ],
       default: "open",
     },
+
+    // ==========================================
+    // PRIORITY
+    // ==========================================
 
     priority: {
       type: String,
@@ -54,8 +74,36 @@ const issueSchema = new mongoose.Schema(
       default: "medium",
     },
 
+    // ==========================================
+    // DUE DATE
+    // ==========================================
+
     dueDate: {
       type: Date,
+      default: null,
+    },
+
+    // ==========================================
+    // AI ISSUE TRACKING
+    // ==========================================
+
+    source: {
+      type: String,
+      enum: [
+        "manual",
+        "ai",
+      ],
+      default: "manual",
+    },
+
+    aiAnalysis: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CodeAnalysis",
+      default: null,
+    },
+
+    aiFindingIndex: {
+      type: Number,
       default: null,
     },
   },

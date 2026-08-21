@@ -10,7 +10,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // Token persists across browser tabs and sessions
+    // Get JWT token
     const token = localStorage.getItem("token");
 
     if (token) {
